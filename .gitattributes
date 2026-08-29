@@ -1,0 +1,5 @@
+# Keep LF in the repository: the GitHub Actions runner is Linux and CRLF
+# would break the shell steps in the APK workflow.
+* text=auto eol=lf
+
+*.png binary

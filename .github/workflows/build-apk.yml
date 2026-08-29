@@ -1,0 +1,66 @@
+name: Build APK
+
+# Builds the WebView shell and publishes it as a permanent download link:
+#   https://github.com/<you>/<repo>/releases/download/apk/wordbook.apk
+#
+# You only need this when you change something inside android/ — for example
+# the site address in android/app/src/main/res/values/config.xml.
+# Editing index.html does NOT need a new APK.
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'android/**'
+      - '.github/workflows/build-apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up the Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Check that the site address was filled in
+        run: |
+          if grep -q "USERNAME.github.io/REPO" android/app/src/main/res/values/config.xml; then
+            echo "::error file=android/app/src/main/res/values/config.xml::Set site_url to your GitHub Pages address before building."
+            exit 1
+          fi
+
+      - name: Build debug APK
+        working-directory: android
+        run: gradle assembleDebug --no-daemon --stacktrace
+
+      - name: Publish the APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk wordbook.apk
+          gh release create apk \
+            --title "Wordbook APK" \
+            --notes "Latest build of the WebView shell. Download **wordbook.apk** on the phone and open it to install." \
+            || echo "release already exists"
+          gh release upload apk wordbook.apk --clobber
+
+      - name: Also keep it as a workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wordbook-apk
+          path: wordbook.apk

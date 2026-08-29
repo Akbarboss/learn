@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ============================================================
+     The address the app opens. This is the only line that ties the
+     APK to the website — change it here and rebuild if the repo or
+     the GitHub account ever changes. The trailing slash matters.
+     ============================================================ -->
+<resources>
+    <string name="site_url" translatable="false">https://akbarboss.github.io/learn/</string>
+</resources>

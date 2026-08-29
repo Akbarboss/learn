@@ -1,0 +1,11 @@
+# Android build output
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.idea/
+*.iml
+
+# OS noise
+Thumbs.db
+.DS_Store

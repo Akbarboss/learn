@@ -1,0 +1,999 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Red Tide Wordbook</title>
+<meta name="description" content="248 words, phrases and grammar patterns from The Mentalist S1E3, with Russian and Uzbek translations.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#EFF3F2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0A1514" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+:root{
+  color-scheme:light dark;
+  --bg:#EFF3F2;
+  --surface:#FFFFFF;
+  --surface-2:#F6FAF9;
+  --ink:#0F1F1E;
+  --ink-2:#44605D;
+  --ink-3:#7C9390;
+  --line:#D7E1DF;
+  --line-soft:#E5ECEA;
+  --ru:#0F5F68;
+  --uz:#A24E17;
+  --accent:#0D5156;
+  --accent-soft:#DCEBEA;
+  --mark:#F0D183;
+  --shadow:0 1px 2px rgba(15,31,30,.05), 0 8px 24px -16px rgba(15,31,30,.28);
+  --veil:rgba(239,243,242,.93);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0A1514;
+    --surface:#111F1E;
+    --surface-2:#172826;
+    --ink:#E4EDEB;
+    --ink-2:#9BB3B0;
+    --ink-3:#6C8683;
+    --line:#213432;
+    --line-soft:#1A2A29;
+    --ru:#63C9CE;
+    --uz:#E8A26D;
+    --accent:#7FD5D5;
+    --accent-soft:#16302F;
+    --mark:#5E4E18;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -16px rgba(0,0,0,.7);
+    --veil:rgba(10,21,20,.94);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0A1514;
+  --surface:#111F1E;
+  --surface-2:#172826;
+  --ink:#E4EDEB;
+  --ink-2:#9BB3B0;
+  --ink-3:#6C8683;
+  --line:#213432;
+  --line-soft:#1A2A29;
+  --ru:#63C9CE;
+  --uz:#E8A26D;
+  --accent:#7FD5D5;
+  --accent-soft:#16302F;
+  --mark:#5E4E18;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -16px rgba(0,0,0,.7);
+  --veil:rgba(10,21,20,.94);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  font-size:16px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:980px;margin:0 auto;padding:0 20px 96px}
+
+/* ---------- header ---------- */
+header.top{padding:56px 0 30px}
+.eyebrow{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.71rem;letter-spacing:.17em;text-transform:uppercase;
+  color:var(--ink-3);margin:0 0 14px;
+}
+h1{
+  font-family:"Zilla Slab",Georgia,serif;
+  font-weight:600;
+  font-size:clamp(2.15rem,6.4vw,3.35rem);
+  line-height:1.04;letter-spacing:-.015em;
+  margin:0 0 16px;text-wrap:balance;
+}
+h1 em{font-style:normal;color:var(--accent)}
+.lede{max-width:62ch;color:var(--ink-2);font-size:1.06rem;margin:0 0 26px}
+.stats{display:flex;flex-wrap:wrap;gap:8px}
+.stat{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.73rem;
+  letter-spacing:.05em;color:var(--ink-2);
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:3px;padding:5px 10px;
+  font-variant-numeric:tabular-nums;
+}
+.stat b{color:var(--ink);font-weight:500}
+
+/* ---------- method ---------- */
+.method{
+  background:var(--surface);border:1px solid var(--line);border-radius:6px;
+  padding:24px 26px;margin:34px 0 8px;box-shadow:var(--shadow);
+}
+.method h2{
+  font-family:"Zilla Slab",Georgia,serif;font-size:1.15rem;font-weight:600;
+  margin:0 0 4px;letter-spacing:-.005em;
+}
+.method .sub{
+  font-size:.86rem;color:var(--ink-3);margin:0 0 20px;
+}
+.steps{display:grid;gap:16px;margin:0;padding:0;counter-reset:step}
+@media(min-width:720px){.steps{grid-template-columns:1fr 1fr;gap:16px 30px}}
+.step{display:flex;gap:13px;align-items:flex-start}
+.step .n{
+  flex:none;width:22px;height:22px;margin-top:2px;
+  display:grid;place-items:center;border-radius:50%;
+  background:var(--accent-soft);color:var(--accent);
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.7rem;font-weight:500;
+}
+.step p{margin:0;font-size:.95rem}
+.step .gloss{display:block;font-size:.84rem;color:var(--ink-3);margin-top:3px}
+
+/* ---------- toolbar ---------- */
+.toolbar{
+  position:sticky;top:0;z-index:20;
+  background:var(--bg);
+  padding:14px 0 12px;
+  margin:34px 0 0;
+  border-bottom:1px solid var(--line);
+}
+.toolbar-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.search{
+  flex:1 1 240px;min-width:0;position:relative;
+}
+.search input{
+  width:100%;font:inherit;font-size:.95rem;
+  padding:9px 12px 9px 34px;
+  background:var(--surface);color:var(--ink);
+  border:1px solid var(--line);border-radius:4px;
+}
+.search input::placeholder{color:var(--ink-3)}
+.search input:focus-visible{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+.search svg{
+  position:absolute;left:11px;top:50%;transform:translateY(-50%);
+  width:14px;height:14px;stroke:var(--ink-3);fill:none;stroke-width:2;
+}
+.btn{
+  font:inherit;font-size:.86rem;
+  padding:9px 14px;border-radius:4px;cursor:pointer;
+  background:var(--surface);color:var(--ink-2);
+  border:1px solid var(--line);
+  white-space:nowrap;
+}
+.btn:hover{color:var(--ink);border-color:var(--ink-3)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+:root[data-theme="dark"] .btn[aria-pressed="true"],
+.btn[aria-pressed="true"]{color:var(--surface)}
+
+.progress{display:flex;align-items:center;gap:9px;margin-top:11px}
+.bar{flex:1;height:3px;background:var(--line);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+.progress span{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.71rem;
+  color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+
+/* ---------- section nav ---------- */
+.jump{display:flex;flex-wrap:wrap;gap:6px;padding:14px 0 2px}
+.jump a{
+  display:inline-flex;align-items:baseline;gap:7px;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.71rem;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--ink-3);text-decoration:none;
+  padding:5px 10px;border:1px solid var(--line);border-radius:3px;
+  background:var(--surface);
+}
+.jump a b{
+  font-weight:500;color:var(--ink-2);
+  font-variant-numeric:tabular-nums;letter-spacing:0;
+}
+.jump a:hover{color:var(--accent);border-color:var(--accent)}
+.jump a:hover b{color:var(--accent)}
+.jump a:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.jump a.off{opacity:.34}
+
+/* ---------- sections ---------- */
+section.chapter{margin-top:52px;scroll-margin-top:150px}
+.chapter-head{
+  display:flex;justify-content:space-between;align-items:baseline;gap:16px;
+  padding-bottom:11px;border-bottom:2px solid var(--ink);
+}
+.chapter-head h2{
+  font-family:"Zilla Slab",Georgia,serif;
+  font-size:clamp(1.35rem,3.4vw,1.72rem);font-weight:600;
+  margin:0;letter-spacing:-.01em;line-height:1.2;
+}
+.chapter-head .native{
+  display:block;font-family:"Source Sans 3",sans-serif;
+  font-size:.85rem;font-weight:400;color:var(--ink-3);margin-top:3px;
+}
+.chapter-head .count{
+  flex:none;font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.72rem;color:var(--ink-3);font-variant-numeric:tabular-nums;
+}
+
+/* ---------- entries ---------- */
+.entries{border-bottom:1px solid var(--line)}
+.entry{
+  display:grid;
+  grid-template-columns:24px minmax(0,1fr);
+  gap:0 10px;
+  padding:15px 0 15px;
+  border-bottom:1px solid var(--line-soft);
+  align-items:start;
+}
+.entry:last-child{border-bottom:none}
+@media(min-width:760px){
+  .entry{grid-template-columns:24px minmax(0,1fr) minmax(0,1.12fr);gap:0 26px}
+}
+.entry.done .en,.entry.done .tr{opacity:.42}
+.entry.hidden{display:none}
+
+.tick{
+  grid-row:1;
+  width:16px;height:16px;margin-top:4px;padding:0;
+  border:1.5px solid var(--line);border-radius:50%;
+  background:transparent;cursor:pointer;
+}
+.tick:hover{border-color:var(--accent)}
+.tick:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.entry.done .tick{background:var(--accent);border-color:var(--accent)}
+
+.en{min-width:0}
+.hw{
+  font-family:"Zilla Slab",Georgia,serif;
+  font-size:1.07rem;font-weight:600;line-height:1.32;
+  margin:0;letter-spacing:-.005em;
+}
+.ipa{
+  display:block;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.75rem;color:var(--ink-3);margin-top:2px;
+}
+.note{
+  margin:7px 0 0;font-size:.85rem;color:var(--ink-2);line-height:1.45;
+}
+.ts{
+  display:inline-block;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.7rem;color:var(--ink-3);
+  background:var(--surface-2);border:1px solid var(--line-soft);
+  border-radius:2px;padding:1px 5px;margin-right:7px;
+  font-variant-numeric:tabular-nums;vertical-align:1px;
+}
+
+.tr{margin:9px 0 0;display:grid;gap:4px}
+@media(min-width:760px){.tr{margin:1px 0 0}}
+.tr-row{display:grid;grid-template-columns:22px minmax(0,1fr);gap:9px;align-items:baseline}
+.tag{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.65rem;letter-spacing:.06em;font-weight:500;padding-top:1px;
+}
+.tag.ru{color:var(--ru)}
+.tag.uz{color:var(--uz)}
+.tr-row p{margin:0;font-size:.96rem;line-height:1.45}
+
+/* hide-mode */
+body.quiz .tr-row p{
+  filter:blur(5.5px);cursor:pointer;user-select:none;
+  transition:filter .12s;
+}
+body.quiz .entry.shown .tr-row p{filter:none;user-select:auto}
+
+mark{background:var(--mark);color:var(--ink);border-radius:2px;padding:0 1px}
+
+.empty{
+  padding:56px 0;text-align:center;color:var(--ink-3);font-size:.95rem;
+}
+
+footer{
+  margin-top:64px;padding-top:22px;border-top:1px solid var(--line);
+  font-size:.83rem;color:var(--ink-3);
+}
+footer p{margin:0 0 6px;max-width:62ch}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation:none!important;transition:none!important}
+}
+@media print{
+  .toolbar,.jump,.method,.tick,.who{display:none!important}
+  body{background:#fff;color:#000;font-size:11pt}
+  .entry{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);page-break-inside:avoid}
+  .tr-row p{filter:none!important}
+  section.chapter{page-break-before:auto}
+}
+
+/* ---------- who is studying ---------- */
+.who{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}
+.who-label{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);
+}
+.profiles{
+  display:flex;gap:3px;padding:3px;
+  background:var(--surface);border:1px solid var(--line);border-radius:5px;
+}
+.profiles button{
+  display:inline-flex;align-items:baseline;gap:6px;
+  font:inherit;font-size:.85rem;padding:5px 11px;
+  border:none;border-radius:3px;background:transparent;color:var(--ink-2);cursor:pointer;
+}
+.profiles button b{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.67rem;font-weight:500;color:var(--ink-3);
+  font-variant-numeric:tabular-nums;
+}
+.profiles button:hover{color:var(--ink)}
+.profiles button[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+.profiles button[aria-pressed="true"] b{color:var(--surface);opacity:.7}
+.profiles button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.who .btn{padding:6px 12px;font-size:.82rem}
+
+/* ---------- choose-a-name gate ---------- */
+.gate{
+  position:fixed;inset:0;z-index:80;
+  display:grid;place-items:center;padding:24px;
+  background:var(--veil);
+}
+.gate[hidden]{display:none}
+.gate-card{
+  width:100%;max-width:340px;
+  background:var(--surface);border:1px solid var(--line);border-radius:8px;
+  padding:26px 24px;box-shadow:0 20px 60px -24px rgba(0,0,0,.45);
+}
+.gate-card h2{
+  font-family:"Zilla Slab",Georgia,serif;font-size:1.3rem;font-weight:600;
+  margin:0 0 3px;letter-spacing:-.01em;
+}
+.gate-card p{margin:0 0 20px;font-size:.87rem;color:var(--ink-3)}
+.gate-btns{display:grid;gap:8px}
+.gate-btns button{
+  display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+  font:inherit;font-size:1rem;text-align:left;
+  padding:13px 16px;border-radius:5px;cursor:pointer;
+  background:var(--surface-2);color:var(--ink);border:1px solid var(--line);
+}
+.gate-btns button b{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.7rem;font-weight:500;color:var(--ink-3);
+  font-variant-numeric:tabular-nums;
+}
+.gate-btns button:hover{border-color:var(--accent);color:var(--accent)}
+.gate-btns button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translateX(-50%);
+  background:var(--ink);color:var(--bg);
+  font-size:.86rem;padding:10px 18px;border-radius:5px;
+  box-shadow:0 8px 30px -10px rgba(0,0,0,.5);
+  opacity:0;pointer-events:none;transition:opacity .2s;z-index:60;max-width:90vw;
+}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header class="top">
+  <p class="eyebrow">The Mentalist &nbsp;·&nbsp; Season 1, Episode 3</p>
+  <h1>Red Tide <em>Wordbook</em></h1>
+  <p class="lede">Every word, phrase and grammar pattern worth learning from this episode &mdash; each one with a Russian and an Uzbek translation, and the minute where you can hear it. Watch the scene, then read the page.</p>
+  <div class="stats">
+    <span class="stat"><b id="totalCount">0</b> entries</span>
+    <span class="stat">8 chapters</span>
+    <span class="stat">EN &rarr; RU &rarr; UZ</span>
+    <span class="stat">45 min episode</span>
+  </div>
+</header>
+
+<div class="method">
+  <h2>How to study with a film</h2>
+  <p class="sub">Kino orqali o&rsquo;rganish tartibi &nbsp;·&nbsp; Как учиться по фильму</p>
+  <div class="steps">
+    <div class="step"><span class="n">1</span><p>Watch a 10-minute chunk once, with both subtitles on. Do not stop, do not look anything up.
+      <span class="gloss">Бир марта тўхтамасдан кўринг. &nbsp;·&nbsp; Смотрите один раз без остановки.</span></p></div>
+    <div class="step"><span class="n">2</span><p>Watch the same chunk again. Pause on the lines you did not understand and find them below by their timestamp.
+      <span class="gloss">Тушунмаган гапларингизни вақт белгиси бўйича топинг. &nbsp;·&nbsp; Ищите непонятные фразы по таймкоду.</span></p></div>
+    <div class="step"><span class="n">3</span><p>Press <b>Hide translations</b> and go down the list. Say the Russian and Uzbek out loud, then tap to check.
+      <span class="gloss">Ўзингизни текширинг. &nbsp;·&nbsp; Проверяйте себя.</span></p></div>
+    <div class="step"><span class="n">4</span><p>Watch the whole episode again with English subtitles only. You will now catch the lines you studied.
+      <span class="gloss">Фақат инглизча субтитр билан яна кўринг. &nbsp;·&nbsp; Пересмотрите только с английскими субтитрами.</span></p></div>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="toolbar-row">
+    <label class="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+      <input id="q" type="search" placeholder="Search English, Russian or Uzbek…" autocomplete="off" aria-label="Search entries">
+    </label>
+    <button class="btn" id="quizBtn" aria-pressed="false">Hide translations</button>
+    <button class="btn" id="resetBtn">Reset progress</button>
+  </div>
+  <div class="progress">
+    <div class="bar"><i id="barFill"></i></div>
+    <span id="progLabel">0 / 0 learned</span>
+  </div>
+  <div class="who">
+    <span class="who-label">Kim o&rsquo;qiyapti</span>
+    <div class="profiles" id="profiles" role="group" aria-label="Choose who is studying"></div>
+    <button class="btn" id="reportBtn">Copy report</button>
+  </div>
+</div>
+
+<div class="gate" id="gate" hidden>
+  <div class="gate-card">
+    <h2>Kim o&rsquo;qiyapti?</h2>
+    <p>Кто занимается &mdash; выберите имя</p>
+    <div class="gate-btns" id="gateBtns"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<nav class="jump" id="jump" aria-label="Jump to chapter"></nav>
+
+<main id="out"></main>
+
+<footer>
+  <p>Built from the double-subtitle file for <i>The Mentalist</i> S1&nbsp;E3 &ldquo;Red Tide&rdquo;. Timestamps point at the minute the line is spoken, so you can scrub straight to it.</p>
+  <p>Your learned-word marks are saved in this browser only.</p>
+</footer>
+
+</div>
+
+<script>
+/* [english, ipa, russian, uzbek, timestamp, note] */
+const DATA=[
+["Crime &amp; investigation","Преступление и расследование","Jinoyat va tergov","crime",[
+["victim","ˈvɪktɪm","жертва, потерпевший","jabrlanuvchi, qurbon","0:41",""],
+["coroner","ˈkɔːrənər","коронер, судмедэксперт","sud-tibbiyot eksperti","0:49","The official who decides how someone died. Very common word in crime shows."],
+["wound","wuːnd","рана","yara, jarohat","0:49","Say it “WOOND”, not “waund”. That other sound is the past tense of <i>wind</i>."],
+["drown","draʊn","утонуть; утопить","cho'kmoq; cho'ktirmoq","0:47","Same verb both ways: <i>she drowned</i> = she died; <i>he drowned her</i> = he killed her."],
+["lungs","lʌŋz","лёгкие","o'pka","0:49","“Water in her lungs” is how they prove drowning."],
+["killer","ˈkɪlər","убийца","qotil","0:57",""],
+["murder","ˈmɜːrdər","убийство","qotillik","21:27","<i>Murder</i> is on purpose. An accident is <i>manslaughter</i>."],
+["homicide detective","ˈhɑːməsaɪd","детектив по убийствам","qotillik bo'yicha tergovchi","19:23",""],
+["crime scene","","место преступления","jinoyat sodir bo'lgan joy","24:47",""],
+["evidence","ˈevɪdəns","улики, доказательства","dalil, isbot","26:07","Uncountable — never <i>evidences</i>. Say <i>a piece of evidence</i>."],
+["clue","kluː","зацепка, ключ к разгадке","ishora, kalit dalil","31:52",""],
+["motive","ˈmoʊtɪv","мотив","sabab, motiv","27:10","The <i>reason</i> to kill. Police look for motive, means and opportunity."],
+["hunch","hʌntʃ","догадка, чутьё","ichki sezgi, taxmin","27:13","A feeling with no proof behind it. <i>I have a hunch.</i>"],
+["suspect","ˈsʌspekt","подозреваемый","gumondor","",'Noun: SUS-pect. Verb: sus-PECT ("подозревать").'],
+["person of interest","","лицо, представляющее интерес","tergovni qiziqtirgan shaxs","17:44","A polite way to say “suspect” without accusing anyone yet."],
+["arrest","əˈrest","арестовать; арест","hibsga olmoq; hibs","17:48",""],
+["confess / confession","kənˈfes","признаться / признание","iqror bo'lmoq / iqror","27:54",""],
+["interrogation","ɪnˌterəˈɡeɪʃn","допрос","so'roq","25:10",""],
+["testimony","ˈtestɪmoʊni","показания в суде","guvohlik ko'rsatuvi","41:33",""],
+["witness","ˈwɪtnəs","свидетель","guvoh","",""],
+["alibi","ˈæləbaɪ","алиби","alibi","35:09","Latin for “elsewhere” — proof you were somewhere else."],
+["attorney","əˈtɜːrni","адвокат; прокурор","advokat","26:31","American word. British English says <i>solicitor</i> or <i>barrister</i>."],
+["lawyer","ˈlɔːjər","юрист, адвокат","yurist, advokat","25:33",""],
+["prosecutor / the DA","ˈprɑːsɪkjuːtər","прокурор","prokuror","12:17","<b>DA</b> = District Attorney, the state prosecutor in the US."],
+["pending charges","","предъявленные обвинения","ko'rilayotgan ayblovlar","12:17","<i>Pending</i> = not decided yet, still waiting."],
+["possession","pəˈzeʃn","хранение (наркотиков)","(giyohvandlik moddasini) saqlash","10:56","In court, <i>possession</i> alone means drug possession."],
+["resisting arrest","","сопротивление при аресте","hibsga qarshilik ko'rsatish","10:56",""],
+["serve time","","отсидеть срок","qamoqda muddat o'tamoq","29:59","<i>He served time for assault.</i>"],
+["lockup","ˈlɑːkʌp","изолятор, КПЗ","saqlash joyi, qamoqxona","10:54","Short-term jail, before trial."],
+["jail","dʒeɪl","тюрьма","qamoq, turma","26:43",""],
+["assault","əˈsɔːlt","нападение, побои","hujum, tan jarohati yetkazish","11:15","Note the silent-ish <i>l</i>: uh-SAWLT."],
+["trespassing","ˈtrespəsɪŋ","незаконное проникновение на территорию","ruxsatsiz kirish","20:42",""],
+["wrongful arrest","","неправомерный арест","noqonuniy hibsga olish","28:53",""],
+["unlawful imprisonment","","незаконное лишение свободы","noqonuniy qamoqqa olish","28:56",""],
+["sue somebody","suː","подать в суд на кого-то","sudga bermoq","28:50","<i>a suit / lawsuit</i> = иск, da'vo. <i>Drop the suit</i> = отозвать иск."],
+["guilty / innocent","ˈɡɪlti","виновный / невиновный","aybdor / aybsiz","40:04",""],
+["incriminate","ɪnˈkrɪmɪneɪt","обвинить, подставить","aybga tortmoq, ayblamoq","35:45",""],
+["cover something up","","скрыть, замять","yashirmoq, bostirmoq","39:14","<i>A cover-up</i> (noun) = сокрытие."],
+["You have the right to remain silent.","","Вы имеете право хранить молчание.","Siz jim turish huquqiga egasiz.","40:16","The <b>Miranda warning</b>. Police must say it when they arrest you in the US."],
+["Anything you say can and will be used against you in a court of law.","","Всё, что вы скажете, может быть использовано против вас в суде.","Aytgan har bir gapingiz sudda sizga qarshi ishlatilishi mumkin.","40:17","Second line of the Miranda warning."]
+]],
+
+["Phrasal verbs","Фразовые глаголы","Frazal fe'llar","phrasal",[
+["wash up (on a beach)","","выбросить на берег","qirg'oqqa chiqib qolmoq","0:41","Used for bodies and objects the sea throws onto land."],
+["hook up with somebody","","замутить, встречаться (разг.)","(jargon) yaqin munosabatda bo'lmoq","4:28","Informal and usually about a casual relationship, not dating seriously."],
+["hang out with somebody","","тусоваться, проводить время","birga vaqt o'tkazmoq","8:23","The everyday word for spending free time together."],
+["hang at a place","","зависать где-то","bir joyda yurmoq","3:49","Shorter, more slangy: <i>we hang at the same breaks.</i>"],
+["pick somebody up","","заехать за кем-то","(mashinada) olib ketmoq","8:33",""],
+["look after somebody","","присматривать за кем-то","qaramoq, boqmoq","7:55","<i>Look after</i> = care for. <i>Look for</i> = search. Very different."],
+["take over for somebody","","взять на себя обязанности","o'rnini bosmoq, zimmasiga olmoq","7:51",""],
+["show up","","появиться, прийти","kelmoq, paydo bo'lmoq","23:39","<i>People just don't show up for work.</i>"],
+["cut out","","свалить, уйти (разг.)","jo'nab qolmoq","21:04","<i>We cut out about ten.</i> Only in casual speech."],
+["walk off the job","","бросить работу и уйти","ishni tashlab ketmoq","23:44",""],
+["run out of something","","закончиться (о запасе)","tugab qolmoq","21:16","<i>We ran out of brews.</i> The thing runs out, or you run out of it."],
+["come up with something","","придумать; вспомнить","o'ylab topmoq; esga tushirmoq","31:44",""],
+["turn somebody in","","сдать полиции","(politsiyaga) topshirmoq","30:26","<i>Turn in my own dad?</i>"],
+["tell on somebody","","наябедничать, выдать","chaqmoq, sotib qo'ymoq","40:08","Childhood word, used by adults too. Slightly shameful."],
+["stumble across something","","случайно наткнуться на","tasodifan duch kelmoq","29:41",""],
+["let something go","","отпустить, забыть об этом","qo'yib yubormoq, unutmoq","2:56","<i>You've gotta let it go.</i> = Забудь уже."],
+["calm down","","успокоиться","tinchlanmoq","18:02",""],
+["mess around inside something","","копаться, лезть","kovlashmoq, aralashmoq","31:55","<i>I don't want you messing around inside my head.</i>"],
+["cut somebody loose","","отпустить кого-то","qo'yib yubormoq","26:48",""],
+["take something up with somebody","","обратиться с жалобой к кому-то","shikoyat qilmoq","25:35","<i>I'm taking this up with your superiors.</i>"],
+["get caught","","попасться","qo'lga tushmoq","20:40","<i>We can't get caught for drinking.</i>"],
+["come along","","появиться (в жизни, в компании)","paydo bo'lmoq","38:50","<i>Then Chris came along.</i>"],
+["go out","","выйти в море (сёрфинг)","(dengizga) chiqmoq","5:11","Surfer usage: <i>Chris loved to go out at sunset.</i>"],
+["step off","","отвали, отойди (сленг)","narida tur, ket (jargon)","36:25","Aggressive. Don't use it politely."],
+["work somebody","","обрабатывать на допросе","so'roqda gapga solmoq","27:23","<i>Let us work Kurtik.</i> Police jargon."],
+["put something into effect","","привести в действие","amalga oshirmoq","28:21",""],
+["get out","","убираться","chiqib ketmoq","36:20","<i>The guard told us to get out.</i>"],
+["hold somebody under","","держать под водой","suv ostida ushlab turmoq","37:21",""],
+["drag somebody","dræɡ","тащить, оттащить","sudramoq","37:18",""],
+["wash away","","смыть, исчезнуть","yuvilib ketmoq, yo'q bo'lmoq","37:00","Figurative here: <i>everything he'd worked for was washing away.</i>"]
+]],
+
+["Idioms &amp; expressions","Идиомы и выражения","Iboralar va turg'un birikmalar","idioms",[
+["Who's got shotgun?","","Кто садится впереди?","Oldinga kim o'tiradi?","2:09","<i>Shotgun</i> = the front passenger seat. You claim it by shouting the word."],
+["No big deal.","","Ничего страшного. Пустяки.","Katta gap emas.","4:48","Very common. Also: <i>It's no big deal.</i>"],
+["What's the big deal?","","Что тут такого?","Nima bo'pti?","20:06","Slightly defensive — you think someone is overreacting."],
+["It's not my business.","","Это не моё дело.","Bu mening ishim emas.","25:25","Also <i>none of your business</i> = не твоё дело."],
+["Get real.","","Очнись. Будь реалистом.","Hushingni yig'. Haqiqatga qara.","30:18",""],
+["Get out of here!","","Да ладно! Не может быть!","Qo'ysang-chi! Ishonmayman!","23:55","Not literal — it means “I can't believe that”."],
+["No way.","","Не может быть. / Ни за что.","Aslo. / Bo'lishi mumkin emas.","30:15","Two meanings: disbelief, or a hard refusal."],
+["Dream on.","","Мечтай. (насмешливо)","Xayol qilaver.","14:25","Mocking — “that will never happen”."],
+["Best of luck.","","Удачи вам.","Omad tilayman.","29:00","Said here with heavy sarcasm — tone changes everything."],
+["Don't be shy.","","Не стесняйтесь.","Uyalmang. Tortinmang.","39:28",""],
+["Have a seat.","","Присаживайтесь.","O'tiring.","39:24","Softer and friendlier than <i>Sit down.</i>"],
+["It takes as long as it takes.","","Займёт столько, сколько нужно.","Qancha kerak bo'lsa, shuncha vaqt oladi.","22:32","A polite way to refuse to be hurried."],
+["It boggles my mind.","","Уму непостижимо.","Aqlim bovar qilmaydi.","23:41",""],
+["a big cheese","","большая шишка","katta odam, nufuzli shaxs","26:47","Informal. Also <i>a big shot</i>, <i>a big wheel</i>."],
+["a cast-iron alibi","","железное алиби","temirdek mustahkam alibi","35:09","<i>Cast-iron</i> = unbreakable. Also <i>a cast-iron excuse</i>."],
+["clear as day","","ясно как день","kunday ravshan","35:19",""],
+["deep down","","в глубине души","qalb tubida","16:07","<i>Deep down you're a good man.</i>"],
+["once and for all","","раз и навсегда","bir yo'la, butunlay","14:20",""],
+["on my mother's life","","клянусь мамой","onam haqqi (qasam)","17:39","A strong oath. People also swear <i>on my life</i>."],
+["not a scratch","","ни царапины","bir tirnalgan joyi ham yo'q","7:43","Used about someone who survived an accident untouched."],
+["all the same","","всё равно, тем не менее","baribir, shunday bo'lsa ham","6:34","Introduces a polite objection: <i>All the same, we have to ask.</i>"],
+["if anything","","если уж на то пошло; скорее наоборот","aksincha, agar shunday bo'lsa","11:13","Corrects the previous sentence in the opposite direction."],
+["then again","","с другой стороны","yana bir tomondan","30:08",""],
+["now that you mention it","","раз уж вы об этом заговорили","aytganingizdan keyin esladim","12:06",""],
+["for heaven's sake","","ради всего святого","xudo haqqi","24:20","Mild frustration. Stronger version: <i>for God's sake</i>."],
+["What can you do?","","Ну что поделаешь?","Nima ham qilardik?","15:14","A shrug in words — accepting something you can't change."],
+["What's not to like?","","Что тут может не нравиться?","Yoqmaydigan nimasi bor?","15:53",""],
+["a good influence on somebody","ˈɪnfluəns","хорошее влияние на кого-то","kimgadir yaxshi ta'sir","8:36","Opposite: <i>a bad influence on somebody</i>."],
+["give somebody a shot","","дать шанс","imkoniyat bermoq","29:13","Also <i>give it a shot</i> = попробовать, urinib ko'rmoq."],
+["a stern talking-to","stɜːrn","строгий выговор","qattiq tanbeh","27:04","<i>Give somebody a stern talking-to.</i>"],
+["damn near","","чуть не, почти","sal bo'lmasa, deyarli","42:14","Strong and informal: <i>damn near killed me.</i>"],
+["do a number on somebody","","сильно навредить, разделать","qattiq zarar yetkazmoq","14:05","<i>You did quite a number on her.</i>"],
+["go crazy","","сойти с ума, взбеситься","aqldan ozmoq, jinni bo'lmoq","39:17",""],
+["take part","","принять участие","qatnashmoq, ishtirok etmoq","40:04","<i>Take part in something</i> — note: <i>in</i>, not <i>at</i>."],
+["have a thing for somebody","","иметь слабость к, запасть на","kimgadir xushi bor","27:29",""],
+["be into something","","увлекаться чем-то","qiziqmoq, ishqiboz bo'lmoq","11:11","<i>She wasn't into drugs.</i> Very common in speech."],
+["She was into it.","","Она сама этого хотела.","O'zi ham xohlagan edi.","36:36","Same phrase, different meaning: willing, not forced."],
+["be asking for it","","сам напросился","o'zi izlab oldi","27:01","Said about someone who provoked the trouble they got."],
+["be all about something","","быть за что-то, жить этим","(bir ishning) tarafdori bo'lmoq","16:19","<i>I'm all about doing what's right.</i>"],
+["sunset patrol","","вечерний заплыв на закате","quyosh botishidagi syorfing","7:07","Surfer slang for the last surf of the day."],
+["no matter how / what","","не важно как / что","qanday bo'lishidan qat'i nazar","25:58",""],
+["My mom would exterminate me.","ɪkˈstɜːrmɪneɪt","Мама меня уничтожит.","Onam meni yeb qo'yadi.","20:40","Deliberate exaggeration — teenagers pick huge words on purpose."],
+["Don't leave town.","","Не покидайте город.","Shahardan chiqmang.","22:15","A stock line from every police film, used here as a joke."],
+["work somebody gently","","работать с кем-то аккуратно","ehtiyotkorlik bilan ish yuritmoq","27:26",""],
+["a love triangle","","любовный треугольник","sevgi uchburchagi","29:48",""]
+]],
+
+["Everyday conversation","Разговорные фразы","Kundalik gaplar","talk",[
+["Excuse me.","","Извините.","Kechirasiz.","3:27","To get attention or to apologise for a small thing."],
+["Excuse the mess.","","Простите за беспорядок.","Tartibsizlik uchun uzr.","6:08","What you say when a guest walks into your untidy home."],
+["Excuse us.","","Извините нас.","Bizni kechiring.","38:04","Said when two of you step away from a group."],
+["We'll do our best.","","Мы сделаем всё возможное.","Qo'limizdan kelganini qilamiz.","5:22",""],
+["Thanks for coming.","","Спасибо, что пришли.","Kelganingiz uchun rahmat.","28:33",""],
+["That's okay.","","Ничего страшного.","Zarari yo'q.","6:23","The normal reply to an apology."],
+["No problem. / No problemo.","","Без проблем.","Muammo yo'q.","34:28","<i>No problemo</i> is a joke version. Friends only."],
+["Hold on.","","Подожди.","Kuting. Shoshmang.","10:47","Also on the phone: <i>hold on a second</i>."],
+["Got it.","","Понял.","Tushundim.","10:47","Short for <i>I've got it</i>."],
+["Come on.","","Ну же. / Да ладно.","Qani. / Qo'ysang-chi.","18:33","Encouraging or disbelieving — tone decides which."],
+["Let's go.","","Пошли.","Ketdik.","11:21",""],
+["Can we go now?","","Мы можем уже ехать?","Endi ketsak bo'ladimi?","2:12",""],
+["What do you want?","","Что вам нужно?","Nima xohlaysiz?","11:41","Blunt. Softer: <i>What can I do for you?</i>"],
+["What do you say?","","Что скажешь?","Nima deysiz?","32:10","Asking someone to agree to a proposal."],
+["What happened?","","Что случилось?","Nima bo'ldi?","3:55",""],
+["We don't know yet.","","Мы пока не знаем.","Hali bilmaymiz.","3:56","Note the position of <i>yet</i> — at the end."],
+["Any idea where…?","","Есть идеи, где…?","…qayerdaligini bilasizmi?","7:05","A relaxed way to ask a question."],
+["When was the last time you saw her?","","Когда вы в последний раз видели её?","Uni oxirgi marta qachon ko'rgansiz?","4:02","Standard police question. Learn it whole."],
+["How long was she in the water?","","Как долго она была в воде?","U suvda qancha vaqt bo'lgan?","3:13","<i>How long</i> = duration, not length."],
+["Are you serious?","","Ты серьёзно?","Rostdanmi?","31:48",""],
+["Are you okay?","","Ты в порядке?","Yaxshimisiz?","10:13",""],
+["I'm sorry.","","Сожалею. / Извините.","Afsusdaman. / Kechirasiz.","7:30","Here it means sympathy for a death, not an apology."],
+["Look at me.","","Посмотрите на меня.","Menga qarang.","18:13","Used to calm someone down or make them focus."],
+["You need to go home.","","Вам нужно домой.","Uyingizga borishingiz kerak.","19:19",""],
+["Shut up.","","Заткнись.","Jim bo'l.","20:35","Rude. Between close friends it can be playful."],
+["No offense.","","Без обид.","Xafa bo'lmang.","31:55","Said before or after something that might insult. Reply: <i>None taken.</i>"],
+["Tell me the truth.","","Скажи мне правду.","Menga rostini ayting.","26:15",""],
+["That's all we need for now.","","Это всё, что нам нужно пока.","Hozircha shuncha yetarli.","22:13",""],
+["We'll be in touch.","","Мы свяжемся с вами.","Aloqada bo'lamiz.","25:12","Polite ending to a business or official conversation."],
+["Thanks for your help.","","Спасибо за помощь.","Yordamingiz uchun rahmat.","34:28",""]
+]],
+
+["Slang &amp; teen talk","Сленг и молодёжная речь","Yoshlar tili va jargon","slang",[
+["Duh.","dʌ","Ну конечно! (очевидно же)","Albatta-da! (ma'lum-ku)","4:41","Says the other person asked something obvious. A little rude."],
+["Dude.","duːd","Чувак. / Блин.","Og'ayni. / Voy.","20:03","Both a name for a person and a reaction word."],
+["Jeez.","dʒiːz","Боже.","Voy.","4:32","A softened form of <i>Jesus</i>, so it doesn't offend."],
+["Damn. / Damn it.","dæm","Чёрт.","La'nati. Attang.","12:00","Mild swearing, very common in film."],
+["What the hell is going on?","","Что, чёрт возьми, происходит?","Nima bo'lyapti o'zi?","24:16","<i>The hell</i> just adds anger to a question."],
+["brews","bruːz","пивко","pivo (jargon)","21:16","Slang for beers, from <i>to brew</i> = варить."],
+["raging (party)","ˈreɪdʒɪŋ","бурная, дикая (вечеринка)","qizigan, shov-shuvli (bazm)","21:03",""],
+["wasted","ˈweɪstɪd","в стельку пьяный","mast, kayfi oshgan","36:03","Also: <i>hammered</i>, <i>trashed</i>. All very informal."],
+["You guys suck!","","Вы отстой!","Siz yomonsiz!","34:08","<i>X sucks</i> = X is bad. Casual, slightly rude."],
+["Screw you. / Screw it.","","Да пошёл ты. / Да ну его.","Qo'y-e. / Jin ursin.","34:01","Rude. <i>Screw it</i> alone means “I give up on this”."],
+["That's bull.","","Это чушь.","Bu bema'nilik.","38:13","Short for a stronger word. <i>That's nonsense</i> is the polite version."],
+["jerk","dʒɜːrk","придурок","ahmoq, tentak","39:24",""],
+["a tool","tuːl","козёл, недалёкий человек","ahmoq, foydasiz odam","38:04","Insult: someone who is used by others and doesn't notice."],
+["badass","ˈbædæs","крутой, жёсткий","zo'r, qattiqqo'l","11:15","An insult in form, but usually a compliment in meaning."],
+["epic","ˈepɪk","офигенный, эпичный","zo'r, ajoyib","7:07","<i>Epic swell</i> — surfer praise."],
+["heinous","ˈheɪnəs","отвратительный, мерзкий","jirkanch, dahshatli","20:53","A very formal word — the teenager uses it as a joke."],
+["Chris was good people.","","Крис была хорошим человеком.","Chris yaxshi odam edi.","5:18","<i>Good people</i> about one person is warm American slang."],
+["gotta (= have got to)","ˈɡɑːtə","должен, надо","kerak, shart","2:56","Speech only. Write <i>have got to</i> or <i>have to</i>."],
+["gonna (= going to)","ˈɡɔːnə","собираться (сделать)","-moqchi","17:54","Speech only. Write <i>going to</i>."],
+["'cause (= because)","kəz","потому что","chunki","16:07","Speech only."],
+["and whatnot","","и всё такое","va shunga o'xshash narsalar","8:33","Ends a list you don't want to finish."],
+["Stuff like that.","","Что-то в этом роде.","Shunga o'xshash narsalar.","5:21","Same job as <i>and whatnot</i>, even more common."],
+["be all that","","быть главной, самой крутой","eng zo'ri bo'lmoq","38:50","<i>Used to be Hope who was all that.</i>"],
+["Yep. / Yeah.","","Ага. / Да.","Ha.","0:45","<i>Yep</i> is short and definite; <i>yeah</i> is relaxed."],
+["Huh?","hʌ","А? / Да?","A? / Shundaymi?","7:51","At the end of a sentence it asks the listener to agree."],
+["Sure you did.","","Конечно убивал. (сарказм)","Albatta, qilgansiz. (kinoya)","39:35","The words agree; the tone disagrees. Classic sarcasm."]
+]],
+
+["Ocean &amp; surfing","Океан и сёрфинг","Okean va syorfing","ocean",[
+["surf / surfer / surfboard","sɜːrf","сёрфинг / сёрфер / доска","syorfing / syorfingchi / syorfing taxtasi","0:49",""],
+["swell","swel","зыбь, набегающие волны","dengiz to'lqinlanishi","7:07","The long waves that arrive from a distant storm."],
+["a break / point break","breɪk","спот, место где ломается волна","to'lqin sinadigan joy","3:49","<i>We hang at the same breaks</i> = we surf the same spots."],
+["current","ˈkɜːrənt","течение","oqim","3:11","Same spelling as <i>current</i> = нынешний. Different meaning."],
+["tide","taɪd","прилив и отлив","suv qalqishi va qaytishi","","<b>Red tide</b> = a bloom of red algae that poisons the water — the title of the episode."],
+["shore","ʃɔːr","берег","qirg'oq","","<i>Offshore</i> = from the land out; <i>onshore</i> = from the sea in."],
+["coast / coast guard","koʊst","побережье / береговая охрана","qirg'oq / qirg'oq qo'riqlash xizmati","3:07",""],
+["beach","biːtʃ","пляж","plyaj, sohil","0:41",""],
+["bluff","blʌf","утёс, обрыв над морем","qoyali jarlik","31:52","Also a verb: <i>to bluff</i> = блефовать, aldab qo'rqitmoq."],
+["bonfire","ˈbɑːnfaɪər","костёр","gulxan","32:41",""],
+["ocean","ˈoʊʃn","океан","okean","15:42",""],
+["marine life","məˈriːn","морская флора и фауна","dengiz jonivorlari va o'simliklari","21:33",""],
+["dolphin","ˈdɑːlfɪn","дельфин","delfin","19:37",""],
+["killer whale","weɪl","касатка","kasatka (qotil kit)","19:39",""],
+["gull","ɡʌl","чайка","chag'alay","19:42",""],
+["hawk / bird of prey","hɔːk, preɪ","ястреб / хищная птица","qirg'iy / yirtqich qush","19:42","<i>Prey</i> = добыча, o'lja. Sounds the same as <i>pray</i> = молиться."],
+["rabbit","ˈræbɪt","кролик","quyon","5:04",""],
+["storm drain","","ливневая канализация","yomg'ir suvi kanalizatsiyasi","14:24",""],
+["sump oil","sʌmp","отработанное масло","ishlatilgan moy","14:24",""],
+["ditchwater","ˈdɪtʃwɔːtər","стоячая вода из канавы","ariqdagi turg'un suv","0:54","The clue that broke the case: no salt in her lungs."],
+["trough","trɔːf","корыто, жёлоб","oxur, tarnov","37:18","Spelling trap — <i>-ough</i> sounds like <i>-off</i> here."],
+["Save our oceans.","","Спасите наши океаны.","Okeanlarimizni asraylik.","21:09",""]
+]],
+
+["Describing people","Описание людей","Odamlarni tasvirlash","people",[
+["clever","ˈklevər","умный; хитрый","aqlli; ziyrak","0:57","Can be a compliment or a warning — <i>too clever</i> is bad."],
+["tough","tʌf","жёсткий; трудный","qattiqqo'l; qiyin","15:01","<i>Tough</i> for a person = hard; for a task = difficult."],
+["relevant","ˈreləvənt","важный, относящийся к делу","aloqador, ahamiyatli","5:14","Opposite: <i>irrelevant</i>."],
+["independent","ˌɪndɪˈpendənt","самостоятельный","mustaqil","7:07",""],
+["mature","məˈtʃʊr","зрелый","yetuk, balog'atli","27:38","Opposite: <i>immature</i> = инфантильный."],
+["articulate","ɑːrˈtɪkjələt","красноречивый, чётко излагающий","fikrini aniq bayon qiladigan","27:38","Adjective ends <i>-lət</i>; the verb ends <i>-leɪt</i>."],
+["sincerely","sɪnˈsɪrli","искренне","samimiy","29:48",""],
+["bizarre","bɪˈzɑːr","странный, чудной","g'alati, ajabtovur","26:14","Stress on the second syllable: bi-ZARR."],
+["ridiculous","rɪˈdɪkjələs","нелепый, смешной","kulgili, bema'ni","30:18",""],
+["insane","ɪnˈseɪn","безумный","aqldan ozgan","38:20","In speech it often just means “extreme”."],
+["distorted","dɪˈstɔːrtɪd","искажённый","buzib ko'rsatilgan","38:57",""],
+["hypocritical","ˌhɪpəˈkrɪtɪkl","лицемерный","ikkiyuzlamachi","39:43","Noun: <i>a hypocrite</i> — note the different stress, HIP-o-crit."],
+["jealous of somebody","ˈdʒeləs","ревнивый; завистливый","rashkchi; hasadgo'y","38:44","Here it means envy, not romantic jealousy."],
+["miserable","ˈmɪzrəbl","жалкий, несчастный","ayanchli, baxtsiz","25:50",""],
+["filthy","ˈfɪlθi","грязный","iflos, kir","26:15","Stronger and angrier than <i>dirty</i>."],
+["prissy","ˈprɪsi","жеманный, чопорный","o'zini tutgan, nozikta'b","39:43",""],
+["self-pitying","ˈpɪtiɪŋ","жалеющий себя","o'zini ayaydigan","42:09","From <i>self-pity</i> = жалость к себе."],
+["blinkered","ˈblɪŋkərd","узколобый, с шорами на глазах","tor fikrli","26:18","From the leather blinkers put on a horse's eyes."],
+["upscale","ˈʌpskeɪl","из состоятельных, престижный","badavlat, yuqori tabaqadan","8:29",""],
+["slow (about a person)","sloʊ","медленно соображающий","sekin tushunadigan","6:28","A gentle, indirect way to say someone has a learning disability."],
+["house-proud","","любящий порядок в доме","uyni ozoda tutadigan","6:09",""],
+["lonely","ˈloʊnli","одинокий","yolg'iz","16:45","<i>Lonely</i> = sad about being alone. <i>Alone</i> is just a fact."],
+["depressed","dɪˈprest","в депрессии","tushkun, ruhi tushgan","16:45",""],
+["addicted to something","əˈdɪktɪd","зависимый от чего-то","qaram, ilinib qolgan","16:49","Noun: <i>an addiction</i>."],
+["nuts","nʌts","чокнутый","sal jinni","16:49","<i>A little nuts</i> is affectionate; <i>You're nuts!</i> is stronger."],
+["integrity","ɪnˈteɡrəti","честность, принципиальность","halollik, printsipiallik","39:37","Doing right even when nobody is watching."],
+["morals","ˈmɔːrəlz","мораль, нравственность","axloq, ma'naviyat","39:37",""],
+["grief / to grieve","ɡriːf","горе / горевать","qayg'u / qayg'urmoq","19:15","<i>A grief counselor</i> comes to schools after a student dies."],
+["at a loss","","в растерянности","dovdirab qolgan","29:38","<i>The police are at a loss</i> = they don't know what to do."],
+["appreciate","əˈpriːʃieɪt","ценить","qadrlamoq","40:51","Also <i>I appreciate it</i> = a warm way to say thank you."],
+["deserve","dɪˈzɜːrv","заслуживать","loyiq bo'lmoq, haqli bo'lmoq","42:20",""],
+["regrettable","rɪˈɡretəbl","прискорбный","afsuslanarli","24:37","Formal. Used by people avoiding responsibility."],
+["a cunning plan","ˈkʌnɪŋ","хитроумный план","ayyorona reja","28:21",""],
+["gentle / gently","ˈdʒentl","мягкий / мягко","yumshoq / ehtiyotkorlik bilan","27:26",""]
+]],
+
+["Grammar patterns","Грамматические модели","Grammatik qoliplar","grammar",[
+["Why us?","","При чём тут мы?","Nega biz?","0:47","Short question with the object pronoun: <i>Why me? Why him?</i>"],
+["She would stay out till it was dark.","","Она оставалась там до темноты.","U qorong'i tushguncha qolardi.","5:13","<b>would</b> = a repeated action in the past. Same job as <i>used to</i>."],
+["Used to be Hope who was all that.","","Раньше главной была Хоуп.","Ilgari Xoup eng zo'ri edi.","38:50","<b>used to</b> = a past state that is no longer true."],
+["You must be Danny and Andy.","","Вы, должно быть, Дэнни и Энди.","Siz Denni va Endi bo'lsangiz kerak.","19:29","<b>must be</b> = a confident guess about now."],
+["You couldn't have seen him there.","","Вы не могли его там видеть.","Uni u yerda ko'rgan bo'lishingiz mumkin emas.","35:13","<b>couldn't have + V3</b> = it was impossible in the past."],
+["He might have done this murder.","","Возможно, он совершил это убийство.","Balki bu qotillikni u qilgandir.","23:26","<b>might have + V3</b> = maybe it happened."],
+["Somebody had to have known.","","Кто-то должен был знать.","Kimdir bilishi kerak edi.","18:58","<b>had to have + V3</b> = a logical conclusion about the past."],
+["If I tell you, they will send assassins.","","Если я расскажу, они пришлют убийц.","Aytsam, ular qotil yuborishadi.","2:59","<b>First conditional</b>: a real future. <i>If</i> + present, <i>will</i> + verb."],
+["If you were 15 years younger, I'd give you a shot.","","Если бы вы были на 15 лет моложе, я бы дал вам шанс.","15 yosh yosh bo'lganingizda, imkon berardim.","29:13","<b>Second conditional</b>: unreal present. <i>If</i> + past, <i>would</i> + verb."],
+["How cool would it have been if one had walked in?","","Как круто было бы, если бы кто-то вошёл.","Kimdir kirib kelganida, qanday zo'r bo'lardi.","34:56","<b>Third conditional</b>: unreal past. <i>would have</i> + V3, <i>had</i> + V3."],
+["I'm gonna have somebody take you home.","","Я попрошу, чтобы вас отвезли домой.","Sizni uyingizga olib borishlarini aytaman.","17:54","<b>Causative</b>: <i>have</i> + person + base verb. You arrange it, someone else does it."],
+["He didn't mean to.","","Он не хотел этого.","U ataylab qilmadi.","36:43","The verb after <i>to</i> is dropped because both speakers know it."],
+["Not what Flipper says.","","Флиппер говорит иначе.","Flipper boshqacha aytadi.","20:01","<i>That's</i> is dropped at the start — normal in fast speech."],
+["Two days to notice, and another to report it.","","Два дня, чтобы заметить, и ещё один, чтобы сообщить.","Sezish uchun ikki kun, xabar berish uchun yana bir kun.","9:13","<b>time + to + verb</b> = how long something took."],
+["What if I was next?","","А если бы я была следующей?","Agar keyingisi men bo'lsam-chi?","37:36","<b>What if…?</b> imagines a possibility, good or bad."],
+["All you have to do is go back.","","Всё, что нужно — вернуться.","Faqat orqaga qaytishingiz kerak, xolos.","33:03","<b>All you have to do is + base verb</b> — no <i>to</i> after <i>is</i>."],
+["Do you want to help us catch the killer?","","Хотите помочь нам поймать убийцу?","Qotilni tutishga yordam bermoqchimisiz?","28:32","<b>help + person + base verb</b> — no <i>to</i>."],
+["Be good to them.","","Будьте к ним добры.","Ularga yaxshi munosabatda bo'ling.","41:57","<b>good to</b> somebody = kind. <b>good at</b> something = skilled."],
+["So do you.","","И вы тоже.","Siz ham.","42:20","<b>So + do/does/did/am/is + subject</b> = the same is true of X."],
+["I can't help what I saw.","","Я не могу это контролировать.","Ko'rganimni o'zgartira olmayman.","33:50","<b>can't help</b> + noun or <i>-ing</i> = can't control it."]
+]]
+];
+
+/* ---------- render ---------- */
+const out=document.getElementById('out');
+const jump=document.getElementById('jump');
+const esc=s=>s;
+const slug=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,48);
+
+let total=0;
+const frag=document.createDocumentFragment();
+
+DATA.forEach(([title,ru,uz,id,items])=>{
+  total+=items.length;
+  const sec=document.createElement('section');
+  sec.className='chapter';
+  sec.id=id;
+  const head=document.createElement('div');
+  head.className='chapter-head';
+  head.innerHTML='<h2>'+title+'<span class="native">'+uz+' &nbsp;·&nbsp; '+ru+'</span></h2>'+
+                 '<span class="count">'+items.length+'</span>';
+  sec.appendChild(head);
+
+  const list=document.createElement('div');
+  list.className='entries';
+  items.forEach(([en,ipa,r,u,ts,note])=>{
+    const e=document.createElement('article');
+    e.className='entry';
+    e.dataset.key=slug(en);
+    e.dataset.hay=(en+' '+r+' '+u+' '+(note||'')).replace(/<[^>]+>/g,'').toLowerCase();
+    e.innerHTML=
+      '<button class="tick" aria-label="Mark as learned" aria-pressed="false"></button>'+
+      '<div class="en"><h3 class="hw">'+en+(ipa?'<span class="ipa">/'+ipa+'/</span>':'')+'</h3>'+
+        (note?'<p class="note">'+(ts?'<span class="ts">'+ts+'</span>':'')+note+'</p>'
+             :(ts?'<p class="note"><span class="ts">'+ts+'</span></p>':''))+
+      '</div>'+
+      '<div class="tr">'+
+        '<div class="tr-row"><span class="tag ru">RU</span><p>'+r+'</p></div>'+
+        '<div class="tr-row"><span class="tag uz">UZ</span><p>'+u+'</p></div>'+
+      '</div>';
+    list.appendChild(e);
+  });
+  sec.appendChild(list);
+  frag.appendChild(sec);
+
+  const a=document.createElement('a');
+  a.href='#'+id;
+  a.dataset.jump=id;
+  a.innerHTML=title+' <b>'+items.length+'</b>';
+  jump.appendChild(a);
+});
+out.appendChild(frag);
+document.getElementById('totalCount').textContent=total;
+
+const empty=document.createElement('p');
+empty.className='empty';
+empty.hidden=true;
+empty.textContent='No entry matches that search.';
+out.appendChild(empty);
+
+/* ---------- toast ---------- */
+let toastT;
+function say(msg){
+  const t=document.getElementById('toast');
+  if(!t)return;
+  t.textContent=msg;
+  t.classList.add('on');
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>t.classList.remove('on'),2800);
+}
+
+/* ================= profiles =================
+   Three fixed learners. Everything each one does is stored under their own
+   name: the set of learned words, a full log of every mark and un-mark with
+   its time, and a per-day count. Picking a name loads that person's data. */
+const PEOPLE=['Akbar','Abror','Muhammadali'];
+const PKEY='wordbook:v1';
+const VALID=new Set([...document.querySelectorAll('.entry')].map(e=>e.dataset.key));
+
+const blank=()=>({learned:[],log:[],days:{}});
+let store={active:null,data:{}};
+let learned=new Set();
+
+(function loadStore(){
+  try{
+    const raw=localStorage.getItem(PKEY);
+    if(raw){const parsed=JSON.parse(raw); if(parsed&&typeof parsed==='object')store=parsed;}
+  }catch(e){}
+  if(!store.data||typeof store.data!=='object')store.data={};
+  PEOPLE.forEach(n=>{
+    const p=store.data[n];
+    if(!p||typeof p!=='object'){store.data[n]=blank();return;}
+    if(!Array.isArray(p.learned))p.learned=[];
+    if(!Array.isArray(p.log))p.log=[];
+    if(!p.days||typeof p.days!=='object')p.days={};
+  });
+  if(PEOPLE.indexOf(store.active)<0)store.active=null;
+  // one-time move from the older single-learner version
+  try{
+    const old=localStorage.getItem('redtide-wordbook-learned');
+    if(old&&!store.data.Akbar.learned.length){
+      const arr=JSON.parse(old);
+      if(Array.isArray(arr)&&arr.length)store.data.Akbar.learned=arr;
+    }
+    localStorage.removeItem('redtide-wordbook-learned');
+    localStorage.removeItem('redtide-wordbook-name');
+  }catch(e){}
+})();
+
+function saveStore(){try{localStorage.setItem(PKEY,JSON.stringify(store));}catch(e){}}
+function today(){
+  const d=new Date(),p=x=>String(x).padStart(2,'0');
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+}
+function countFor(name){
+  const p=store.data[name];
+  if(!p)return 0;
+  let n=0;
+  p.learned.forEach(k=>{if(VALID.has(k))n++;});
+  return n;
+}
+
+function paint(){
+  document.querySelectorAll('.entry').forEach(e=>{
+    const on=learned.has(e.dataset.key);
+    e.classList.toggle('done',on);
+    e.querySelector('.tick').setAttribute('aria-pressed',on?'true':'false');
+  });
+  const n=learned.size;
+  document.getElementById('progLabel').textContent=
+    (store.active?store.active+':  ':'')+n+' / '+total+' learned';
+  document.getElementById('barFill').style.width=(total?(n/total*100):0)+'%';
+}
+
+function renderProfiles(){
+  [['profiles',false],['gateBtns',true]].forEach(([id,big])=>{
+    const host=document.getElementById(id);
+    if(!host)return;
+    host.innerHTML='';
+    PEOPLE.forEach(n=>{
+      const b=document.createElement('button');
+      b.type='button';
+      if(!big)b.setAttribute('aria-pressed',store.active===n?'true':'false');
+      b.innerHTML=n+' <b>'+countFor(n)+'</b>';
+      b.addEventListener('click',()=>pick(n,big));
+      host.appendChild(b);
+    });
+  });
+}
+
+function pick(name,announce){
+  store.active=name;
+  learned=new Set((store.data[name].learned||[]).filter(k=>VALID.has(k)));
+  saveStore();
+  paint();
+  renderProfiles();
+  document.getElementById('gate').hidden=true;
+  if(announce)say(name+' — '+learned.size+' / '+total);
+}
+
+function openGate(){document.getElementById('gate').hidden=false;}
+
+renderProfiles();
+if(store.active){pick(store.active,false);}else{paint();openGate();}
+
+out.addEventListener('click',ev=>{
+  const t=ev.target.closest('.tick');
+  if(t){
+    if(!store.active){openGate();say('Avval ismni tanlang · Сначала выберите имя');return;}
+    const key=t.closest('.entry').dataset.key;
+    const on=!learned.has(key);
+    on?learned.add(key):learned.delete(key);
+
+    const p=store.data[store.active];
+    p.learned=[...learned];
+    p.log.push([key,on?1:0,Date.now()]);          // every action, with its time
+    if(p.log.length>6000)p.log.splice(0,p.log.length-6000);
+    if(on){const d=today();p.days[d]=(p.days[d]||0)+1;}
+
+    saveStore();paint();renderProfiles();
+    return;
+  }
+  if(document.body.classList.contains('quiz')){
+    const e=ev.target.closest('.entry');
+    if(e)e.classList.toggle('shown');
+  }
+});
+
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  if(!store.active){openGate();return;}
+  if(!window.confirm(store.active+': clear all '+learned.size+' marks?'))return;
+  store.data[store.active]=blank();
+  learned=new Set();
+  saveStore();paint();renderProfiles();
+  say(store.active+' — reset');
+});
+
+const quizBtn=document.getElementById('quizBtn');
+quizBtn.addEventListener('click',()=>{
+  const on=document.body.classList.toggle('quiz');
+  quizBtn.setAttribute('aria-pressed',on?'true':'false');
+  quizBtn.textContent=on?'Show translations':'Hide translations';
+  if(!on)document.querySelectorAll('.entry.shown').forEach(e=>e.classList.remove('shown'));
+});
+
+/* ---------- search ---------- */
+const q=document.getElementById('q');
+q.addEventListener('input',()=>{
+  const v=q.value.trim().toLowerCase();
+  let any=false;
+  document.querySelectorAll('section.chapter').forEach(sec=>{
+    let shown=0;
+    sec.querySelectorAll('.entry').forEach(e=>{
+      const hit=!v||e.dataset.hay.indexOf(v)>-1;
+      e.classList.toggle('hidden',!hit);
+      if(hit)shown++;
+    });
+    sec.hidden=shown===0;
+    sec.querySelector('.count').textContent=shown;
+    const chip=jump.querySelector('[data-jump="'+sec.id+'"]');
+    if(chip){
+      chip.querySelector('b').textContent=shown;
+      chip.classList.toggle('off',shown===0);
+    }
+    if(shown)any=true;
+  });
+  empty.hidden=any;
+});
+
+/* ---------- progress report (no server: copy & send) ---------- */
+function buildReport(){
+  const name=store.active;
+  const p=store.data[name];
+  const n=learned.size;
+  const pct=total?Math.round(n/total*100):0;
+  const lines=DATA.map(([title,ru,uz,id,items])=>{
+    const got=items.filter(([en])=>learned.has(slug(en))).length;
+    return '  '+title.replace('&amp;','&')+': '+got+'/'+items.length;
+  });
+  const days=Object.keys(p.days).sort().slice(-7).map(d=>'  '+d.slice(5)+' — '+p.days[d]);
+  return 'Red Tide Wordbook · '+name+'\n'+
+         n+' / '+total+'  ('+pct+'%)  ·  '+today()+'\n'+
+         lines.join('\n')+
+         (days.length?'\n\nOxirgi kunlar / последние дни:\n'+days.join('\n'):'');
+}
+
+document.getElementById('reportBtn').addEventListener('click',async()=>{
+  if(!store.active){openGate();say('Avval ismni tanlang · Сначала выберите имя');return;}
+  const text=buildReport();
+  try{
+    await navigator.clipboard.writeText(text);
+    say('Hisobot nusxalandi — Telegramga yuboring');
+    return;
+  }catch(e){}
+  const ta=document.createElement('textarea');
+  ta.value=text;
+  ta.style.cssText='position:fixed;top:0;left:0;opacity:0';
+  document.body.appendChild(ta);
+  ta.focus();ta.select();
+  try{
+    document.execCommand('copy');
+    say('Hisobot nusxalandi — Telegramga yuboring');
+  }catch(e2){
+    window.prompt('Copy this and send it:',text);
+  }
+  ta.remove();
+});
+
+/* ---------- offline ---------- */
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
