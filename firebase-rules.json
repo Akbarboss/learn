@@ -1,0 +1,9 @@
+{
+  "rules": {
+    "$learner": {
+      ".read": "$learner === 'Akbar' || $learner === 'Abror' || $learner === 'Muhammadali'",
+      ".write": "$learner === 'Akbar' || $learner === 'Abror' || $learner === 'Muhammadali'",
+      ".validate": "newData.hasChildren(['learned', 'log', 'days'])"
+    }
+  }
+}

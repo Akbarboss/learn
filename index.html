@@ -819,7 +819,7 @@ const PEOPLE=['Akbar','Abror','Muhammadali'];
 const PKEY='wordbook:v1';
 const VALID=new Set([...document.querySelectorAll('.entry')].map(e=>e.dataset.key));
 const SYNC=window.WORDBOOK_SYNC||{};
-const cloudReady=Boolean(SYNC.url&&SYNC.anonKey&& !String(SYNC.url).includes('YOUR_') && !String(SYNC.anonKey).includes('YOUR_'));
+const cloudReady=Boolean(SYNC.provider==='firebase'&&SYNC.databaseUrl&& !String(SYNC.databaseUrl).includes('YOUR_'));
 
 const blank=()=>({learned:[],log:[],days:{}});
 let store={active:null,data:{}};
@@ -863,13 +863,11 @@ if(cloudReady){
 }else{
   setSyncStatus('Local only','warn');
 }
-function cloudHeaders(extra){
-  return Object.assign({apikey:SYNC.anonKey,Authorization:'Bearer '+SYNC.anonKey,'Content-Type':'application/json'},extra||{});
-}
+function cloudHeaders(extra){return Object.assign({'Content-Type':'application/json'},extra||{});}
 async function cloudFetch(path,options){
   const ctl=new AbortController();
   const timer=setTimeout(()=>ctl.abort(),9000);
-  try{return await fetch(SYNC.url.replace(/\/$/,'')+path,Object.assign({signal:ctl.signal},options||{}));}
+  try{return await fetch(SYNC.databaseUrl.replace(/\/$/,'')+path+'.json',Object.assign({signal:ctl.signal},options||{}));}
   finally{clearTimeout(timer);}
 }
 function mergeProfile(a,b){
@@ -886,19 +884,20 @@ function mergeProfile(a,b){
   return {learned:[...learnedSet],log,days};
 }
 async function cloudGet(name){
-  const res=await cloudFetch('/rest/v1/learner_progress?name=eq.'+encodeURIComponent(name)+'&select=name,learned,log,days,updated_at',{headers:cloudHeaders()});
+  const res=await cloudFetch('/'+encodeURIComponent(name),{headers:cloudHeaders()});
   if(!res.ok)throw new Error('GET '+res.status);
-  const rows=await res.json();
-  return rows[0]||null;
+  const profile=await res.json();
+  return profile?Object.assign({name},profile):null;
 }
 async function cloudGetAll(){
-  const res=await cloudFetch('/rest/v1/learner_progress?select=name,learned,log,days,updated_at',{headers:cloudHeaders()});
-  if(!res.ok)throw new Error('GET '+res.status);
-  return await res.json();
+  return (await Promise.all(PEOPLE.map(async name=>{
+    const row=await cloudGet(name);
+    return row?Object.assign({name},row):null;
+  }))).filter(Boolean);
 }
 async function cloudPut(name,profile){
-  const res=await cloudFetch('/rest/v1/learner_progress?on_conflict=name',{method:'POST',headers:cloudHeaders({Prefer:'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify({name,learned:profile.learned,log:profile.log,days:profile.days,updated_at:new Date().toISOString()})});
-  if(!res.ok)throw new Error('POST '+res.status);
+  const res=await cloudFetch('/'+encodeURIComponent(name),{method:'PUT',headers:cloudHeaders(),body:JSON.stringify({learned:profile.learned,log:profile.log,days:profile.days,updated_at:new Date().toISOString()})});
+  if(!res.ok)throw new Error('PUT '+res.status);
 }
 async function syncAllSummaries(){
   if(!cloudReady)return;
