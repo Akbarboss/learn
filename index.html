@@ -340,6 +340,7 @@ footer p{margin:0 0 6px;max-width:62ch}
   color:var(--accent);font:inherit;font-size:.82rem;line-height:1.2;cursor:pointer;
   vertical-align:middle;opacity:.8;
 }
+.speak svg{width:16px;height:16px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .speak:hover{opacity:1;border-color:var(--accent);transform:translateY(-1px)}
 .speak:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .sync-status{
@@ -770,7 +771,8 @@ DATA.forEach(([title,ru,uz,id,items])=>{
     e.innerHTML=
       '<button class="tick" aria-label="Mark as learned" aria-pressed="false"></button>'+
       '<div class="en"><h3 class="hw">'+en+(ipa?'<span class="ipa">/'+ipa+'/</span>':'')+''+
-        '<button class="speak" type="button" data-speak="'+encodeURIComponent(en)+'" aria-label="Listen to '+en+'" title="Listen">🔊</button></h3>'+
+        '<button class="speak" type="button" data-speak="'+encodeURIComponent(en)+'" aria-label="Listen to '+en+'" title="Listen">'+
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M16 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9.3 9.3 0 0 1 0 13"/></svg></button></h3>'+
         (note?'<p class="note">'+(ts?'<span class="ts">'+ts+'</span>':'')+note+'</p>'
              :(ts?'<p class="note"><span class="ts">'+ts+'</span></p>':''))+
       '</div>'+
@@ -994,6 +996,11 @@ out.addEventListener('click',ev=>{
   if(speak){
     ev.preventDefault();ev.stopPropagation();
     const text=decodeURIComponent(speak.dataset.speak||'');
+    if(window.AndroidTts&&typeof window.AndroidTts.speak==='function'){
+      window.AndroidTts.speak(text);
+      say('Speaking');
+      return;
+    }
     if(!('speechSynthesis' in window)){say('Audio is not available in this browser');return;}
     window.speechSynthesis.cancel();
     const utterance=new SpeechSynthesisUtterance(text);
