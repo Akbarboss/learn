@@ -890,7 +890,7 @@ function mergeProfile(a,b){
   return {learned:[...learnedSet],log,days};
 }
 async function cloudGet(name){
-  const res=await cloudFetch('/'+encodeURIComponent(name),{headers:cloudHeaders()});
+  const res=await cloudFetch('/'+encodeURIComponent(name));
   if(!res.ok)throw new Error('GET '+res.status);
   const profile=await res.json();
   return profile?Object.assign({name},profile):null;
