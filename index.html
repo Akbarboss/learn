@@ -902,7 +902,7 @@ async function cloudGetAll(){
   }))).filter(Boolean);
 }
 async function cloudPut(name,profile){
-  const res=await cloudFetch('/'+encodeURIComponent(name),{method:'PUT',headers:cloudHeaders(),body:JSON.stringify({learned:profile.learned,log:profile.log,days:profile.days,updated_at:new Date().toISOString()})});
+  const res=await cloudFetch('/'+encodeURIComponent(name),{method:'PUT',body:JSON.stringify({learned:profile.learned,log:profile.log,days:profile.days,updated_at:new Date().toISOString()})});
   if(!res.ok)throw new Error('PUT '+res.status);
 }
 async function syncAllSummaries(){
