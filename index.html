@@ -334,6 +334,21 @@ footer p{margin:0 0 6px;max-width:62ch}
 .profiles button[aria-pressed="true"] b{color:var(--surface);opacity:.7}
 .profiles button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .who .btn{padding:6px 12px;font-size:.82rem}
+.speak{
+  display:inline-grid;place-items:center;margin-left:8px;padding:1px 5px;
+  border:1px solid var(--line);border-radius:4px;background:var(--surface-2);
+  color:var(--accent);font:inherit;font-size:.82rem;line-height:1.2;cursor:pointer;
+  vertical-align:middle;opacity:.8;
+}
+.speak:hover{opacity:1;border-color:var(--accent);transform:translateY(-1px)}
+.speak:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sync-status{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.66rem;color:var(--ink-3);white-space:nowrap;
+}
+.sync-status.ok{color:#287b55}
+.sync-status.warn{color:#a0662d}
+.sync-status.error{color:#a44545}
 
 /* ---------- choose-a-name gate ---------- */
 .gate{
@@ -424,6 +439,7 @@ footer p{margin:0 0 6px;max-width:62ch}
     <span class="who-label">Kim o&rsquo;qiyapti</span>
     <div class="profiles" id="profiles" role="group" aria-label="Choose who is studying"></div>
     <button class="btn" id="reportBtn">Copy report</button>
+    <span class="sync-status" id="syncStatus" aria-live="polite">Local</span>
   </div>
 </div>
 
@@ -443,11 +459,12 @@ footer p{margin:0 0 6px;max-width:62ch}
 
 <footer>
   <p>Built from the double-subtitle file for <i>The Mentalist</i> S1&nbsp;E3 &ldquo;Red Tide&rdquo;. Timestamps point at the minute the line is spoken, so you can scrub straight to it.</p>
-  <p>Your learned-word marks are saved in this browser only.</p>
+  <p id="storageNote">Progress is saved in this browser. Cloud sync can be enabled in the project settings.</p>
 </footer>
 
 </div>
 
+<script src="sync-config.js"></script>
 <script>
 /* [english, ipa, russian, uzbek, timestamp, note] */
 const DATA=[
@@ -752,7 +769,8 @@ DATA.forEach(([title,ru,uz,id,items])=>{
     e.dataset.hay=(en+' '+r+' '+u+' '+(note||'')).replace(/<[^>]+>/g,'').toLowerCase();
     e.innerHTML=
       '<button class="tick" aria-label="Mark as learned" aria-pressed="false"></button>'+
-      '<div class="en"><h3 class="hw">'+en+(ipa?'<span class="ipa">/'+ipa+'/</span>':'')+'</h3>'+
+      '<div class="en"><h3 class="hw">'+en+(ipa?'<span class="ipa">/'+ipa+'/</span>':'')+''+
+        '<button class="speak" type="button" data-speak="'+encodeURIComponent(en)+'" aria-label="Listen to '+en+'" title="Listen">🔊</button></h3>'+
         (note?'<p class="note">'+(ts?'<span class="ts">'+ts+'</span>':'')+note+'</p>'
              :(ts?'<p class="note"><span class="ts">'+ts+'</span></p>':''))+
       '</div>'+
@@ -798,6 +816,8 @@ function say(msg){
 const PEOPLE=['Akbar','Abror','Muhammadali'];
 const PKEY='wordbook:v1';
 const VALID=new Set([...document.querySelectorAll('.entry')].map(e=>e.dataset.key));
+const SYNC=window.WORDBOOK_SYNC||{};
+const cloudReady=Boolean(SYNC.url&&SYNC.anonKey&& !String(SYNC.url).includes('YOUR_') && !String(SYNC.anonKey).includes('YOUR_'));
 
 const blank=()=>({learned:[],log:[],days:{}});
 let store={active:null,data:{}};
@@ -830,6 +850,88 @@ let learned=new Set();
 })();
 
 function saveStore(){try{localStorage.setItem(PKEY,JSON.stringify(store));}catch(e){}}
+function setSyncStatus(text,kind){
+  const el=document.getElementById('syncStatus');
+  if(!el)return;
+  el.textContent=text;el.className='sync-status'+(kind?' '+kind:'');
+}
+if(cloudReady){
+  setSyncStatus('Cloud sync','ok');
+  document.getElementById('storageNote').textContent='Progress syncs between devices through the shared cloud database.';
+}else{
+  setSyncStatus('Local only','warn');
+}
+function cloudHeaders(extra){
+  return Object.assign({apikey:SYNC.anonKey,Authorization:'Bearer '+SYNC.anonKey,'Content-Type':'application/json'},extra||{});
+}
+async function cloudFetch(path,options){
+  const ctl=new AbortController();
+  const timer=setTimeout(()=>ctl.abort(),9000);
+  try{return await fetch(SYNC.url.replace(/\/$/,'')+path,Object.assign({signal:ctl.signal},options||{}));}
+  finally{clearTimeout(timer);}
+}
+function mergeProfile(a,b){
+  const logs=[...(a.log||[]),...(b.log||[])];
+  const seen=new Set();
+  const log=logs.filter(row=>{const key=JSON.stringify(row);if(seen.has(key))return false;seen.add(key);return true;}).sort((x,y)=>(x[2]||0)-(y[2]||0)).slice(-6000);
+  const learnedSet=new Set([...(a.learned||[]),...(b.learned||[])].filter(k=>VALID.has(k)));
+  log.forEach(row=>{
+    if(!VALID.has(row[0]))return;
+    if(row[1])learnedSet.add(row[0]);else learnedSet.delete(row[0]);
+  });
+  const days={...(a.days||{})};
+  Object.entries(b.days||{}).forEach(([d,n])=>{days[d]=Math.max(Number(days[d]||0),Number(n||0));});
+  return {learned:[...learnedSet],log,days};
+}
+async function cloudGet(name){
+  const res=await cloudFetch('/rest/v1/learner_progress?name=eq.'+encodeURIComponent(name)+'&select=name,learned,log,days,updated_at',{headers:cloudHeaders()});
+  if(!res.ok)throw new Error('GET '+res.status);
+  const rows=await res.json();
+  return rows[0]||null;
+}
+async function cloudGetAll(){
+  const res=await cloudFetch('/rest/v1/learner_progress?select=name,learned,log,days,updated_at',{headers:cloudHeaders()});
+  if(!res.ok)throw new Error('GET '+res.status);
+  return await res.json();
+}
+async function cloudPut(name,profile){
+  const res=await cloudFetch('/rest/v1/learner_progress?on_conflict=name',{method:'POST',headers:cloudHeaders({Prefer:'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify({name,learned:profile.learned,log:profile.log,days:profile.days,updated_at:new Date().toISOString()})});
+  if(!res.ok)throw new Error('POST '+res.status);
+}
+async function syncAllSummaries(){
+  if(!cloudReady)return;
+  try{
+    const rows=await cloudGetAll();
+    rows.forEach(row=>{if(PEOPLE.includes(row.name)){store.data[row.name]=mergeProfile(store.data[row.name]||blank(),row);}});
+    saveStore();renderProfiles();
+  }catch(e){setSyncStatus('Sync unavailable','error');}
+}
+let pushTimer=0;
+function queueCloudPush(){
+  if(!cloudReady||!store.active)return;
+  clearTimeout(pushTimer);
+  pushTimer=setTimeout(async()=>{
+    const name=store.active;
+    setSyncStatus('Saving…','');
+    try{await cloudPut(name,store.data[name]);setSyncStatus('Synced','ok');}
+    catch(e){setSyncStatus('Offline — local saved','warn');}
+  },250);
+}
+async function syncProfile(name){
+  if(!cloudReady)return;
+  const before=name;
+  setSyncStatus('Loading…','');
+  try{
+    const row=await cloudGet(name);
+    if(before!==store.active)return;
+    if(row)store.data[name]=mergeProfile(store.data[name]||blank(),row);
+    saveStore();
+    learned=new Set((store.data[name].learned||[]).filter(k=>VALID.has(k)));
+    paint();renderProfiles();
+    setSyncStatus('Synced','ok');
+    queueCloudPush();
+  }catch(e){setSyncStatus('Offline — local saved','warn');}
+}
 function today(){
   const d=new Date(),p=x=>String(x).padStart(2,'0');
   return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
@@ -877,13 +979,29 @@ function pick(name,announce){
   paint();
   renderProfiles();
   document.getElementById('gate').hidden=true;
-  if(announce)say(name+' — '+learned.size+' / '+total);
+  if(announce)say(name+' - '+learned.size+' / '+total);
+  syncProfile(name);
 }
 
 function openGate(){document.getElementById('gate').hidden=false;}
 
 renderProfiles();
 if(store.active){pick(store.active,false);}else{paint();openGate();}
+syncAllSummaries();
+
+out.addEventListener('click',ev=>{
+  const speak=ev.target.closest('.speak');
+  if(speak){
+    ev.preventDefault();ev.stopPropagation();
+    const text=decodeURIComponent(speak.dataset.speak||'');
+    if(!('speechSynthesis' in window)){say('Audio is not available in this browser');return;}
+    window.speechSynthesis.cancel();
+    const utterance=new SpeechSynthesisUtterance(text);
+    utterance.lang='en-US';utterance.rate=.82;utterance.pitch=1;
+    window.speechSynthesis.speak(utterance);
+    return;
+  }
+});
 
 out.addEventListener('click',ev=>{
   const t=ev.target.closest('.tick');
@@ -899,7 +1017,7 @@ out.addEventListener('click',ev=>{
     if(p.log.length>6000)p.log.splice(0,p.log.length-6000);
     if(on){const d=today();p.days[d]=(p.days[d]||0)+1;}
 
-    saveStore();paint();renderProfiles();
+    saveStore();paint();renderProfiles();queueCloudPush();
     return;
   }
   if(document.body.classList.contains('quiz')){
@@ -913,7 +1031,7 @@ document.getElementById('resetBtn').addEventListener('click',()=>{
   if(!window.confirm(store.active+': clear all '+learned.size+' marks?'))return;
   store.data[store.active]=blank();
   learned=new Set();
-  saveStore();paint();renderProfiles();
+  saveStore();paint();renderProfiles();queueCloudPush();
   say(store.active+' — reset');
 });
 

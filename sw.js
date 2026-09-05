@@ -5,9 +5,9 @@
      - Google Fonts : cache first — they never change.
    Bump VERSION when you want to throw away every old cache. */
 
-const VERSION = 'v1';
+const VERSION = 'v2';
 const CACHE   = 'wordbook-' + VERSION;
-const SHELL   = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
+const SHELL   = ['./', './index.html', './sync-config.js', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', event => {
   event.waitUntil(

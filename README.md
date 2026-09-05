@@ -181,3 +181,22 @@ android/                   оболочка-WebView
 - **Отметки выученного** — кружок слева, полоса прогресса сверху.
 - **Тёмная тема** — сама подхватывает настройку телефона.
 - **Печать** — страницу можно распечатать как настоящий словарь.
+## Speech and cloud progress
+
+Each English word, phrase or sentence has a 🔊 button. It uses the phone's
+English text-to-speech voice. On Android, install or enable an English
+Text-to-Speech voice if the phone is silent.
+
+The default storage is local to the device. To show the same learned-word
+counts on another phone, connect Supabase:
+
+1. Create a free project at https://supabase.com/.
+2. In SQL Editor, create a table named `learner_progress` with columns
+   `name`, `learned`, `log`, `days`, and `updated_at`, then enable read,
+   insert, and update policies for the public `anon` role.
+3. Copy Project URL and the public `anon` key from Project Settings → API into
+   [sync-config.js](sync-config.js).
+
+Use only the public `anon` key in this file. Never put a `service_role` key in
+the website. After pushing `sync-config.js`, the site will load the selected
+learner's cloud data and save every new mark there.
