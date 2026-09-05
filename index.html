@@ -247,10 +247,13 @@ section.chapter{margin-top:52px;scroll-margin-top:150px}
 
 .en{min-width:0}
 .hw{
+  display:flex;flex-direction:column;align-items:flex-start;
   font-family:"Zilla Slab",Georgia,serif;
   font-size:1.07rem;font-weight:600;line-height:1.32;
   margin:0;letter-spacing:-.005em;
 }
+.word-line{display:inline-flex;align-items:center;gap:8px;max-width:100%}
+.word-text{min-width:0}
 .ipa{
   display:block;
   font-family:"IBM Plex Mono",ui-monospace,monospace;
@@ -776,9 +779,10 @@ DATA.forEach(([title,ru,uz,id,items])=>{
     e.dataset.hay=(en+' '+r+' '+u+' '+(note||'')).replace(/<[^>]+>/g,'').toLowerCase();
     e.innerHTML=
       '<button class="tick" aria-label="Mark as learned" aria-pressed="false"></button>'+
-      '<div class="en"><h3 class="hw">'+en+(ipa?'<span class="ipa">/'+ipa+'/</span>':'')+''+
+      '<div class="en"><h3 class="hw"><span class="word-line"><span class="word-text">'+en+'</span>'+
         '<button class="speak" type="button" data-speak="'+encodeURIComponent(en)+'" aria-label="Listen to '+en+'" title="Listen">'+
-          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M16 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9.3 9.3 0 0 1 0 13"/></svg></button></h3>'+
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M16 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9.3 9.3 0 0 1 0 13"/></svg></button></span>'+
+        (ipa?'<span class="ipa">/'+ipa+'/</span>':'')+'</h3>'+
         (note?'<p class="note">'+(ts?'<span class="ts">'+ts+'</span>':'')+note+'</p>'
              :(ts?'<p class="note"><span class="ts">'+ts+'</span></p>':''))+
       '</div>'+
