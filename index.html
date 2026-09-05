@@ -467,6 +467,12 @@ footer p{margin:0 0 6px;max-width:62ch}
 
 <script src="sync-config.js?v=91863cf"></script>
 <script>
+window.WORDBOOK_SYNC=Object.assign({
+  provider:'firebase',
+  databaseUrl:'https://learn-english-wordbook-default-rtdb.firebaseio.com'
+},window.WORDBOOK_SYNC||{});
+</script>
+<script>
 /* [english, ipa, russian, uzbek, timestamp, note] */
 const DATA=[
 ["Crime &amp; investigation","Преступление и расследование","Jinoyat va tergov","crime",[
@@ -819,7 +825,7 @@ const PEOPLE=['Akbar','Abror','Muhammadali'];
 const PKEY='wordbook:v1';
 const VALID=new Set([...document.querySelectorAll('.entry')].map(e=>e.dataset.key));
 const SYNC=window.WORDBOOK_SYNC||{};
-const cloudReady=Boolean(SYNC.provider==='firebase'&&SYNC.databaseUrl&& !String(SYNC.databaseUrl).includes('YOUR_'));
+const cloudReady=Boolean(SYNC.databaseUrl&& !String(SYNC.databaseUrl).includes('YOUR_'));
 
 const blank=()=>({learned:[],log:[],days:{}});
 let store={active:null,data:{}};
