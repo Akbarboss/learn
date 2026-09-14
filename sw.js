@@ -5,7 +5,7 @@
      - Google Fonts : cache first — they never change.
    Bump VERSION when you want to throw away every old cache. */
 
-const VERSION = 'v3';
+const VERSION = 'v4';
 const CACHE   = 'wordbook-' + VERSION;
 const SHELL   = ['./', './index.html', './sync-config.js', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
@@ -48,8 +48,12 @@ self.addEventListener('fetch', event => {
   if (url.origin !== location.origin) return;
 
   // Our own files: try the network, fall back to whatever we cached last.
+  // `cache: 'no-cache'` makes the browser revalidate with the server instead of
+  // answering from its own HTTP cache. GitHub Pages sends max-age=600, so without
+  // this a phone could show a ten-minute-old page even while online. Revalidation
+  // is cheap — unchanged files come back as a 304.
   event.respondWith(
-    fetch(req)
+    fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' })
       .then(res => {
         const copy = res.clone();
         caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});

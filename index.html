@@ -318,6 +318,11 @@ footer{
   font-size:.83rem;color:var(--ink-3);
 }
 footer p{margin:0 0 6px;max-width:62ch}
+.build{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.72rem;letter-spacing:.03em;opacity:.75;margin-top:12px!important;
+}
+.build b{font-weight:500;color:var(--ink-2)}
 
 @media (prefers-reduced-motion: reduce){
   *{animation:none!important;transition:none!important}
@@ -482,6 +487,7 @@ footer p{margin:0 0 6px;max-width:62ch}
 <footer>
   <p>Built from the double-subtitle file for <i>The Mentalist</i> S1&nbsp;E3 &ldquo;Red Tide&rdquo;. Timestamps point at the minute the line is spoken, so you can scrub straight to it.</p>
   <p id="storageNote">Progress is saved in this browser. Cloud sync can be enabled in the project settings.</p>
+  <p class="build">Version <b>2026-09-14b</b> &nbsp;·&nbsp; 247 entries with examples</p>
 </footer>
 
 </div>
@@ -1151,10 +1157,27 @@ document.getElementById('reportBtn').addEventListener('click',async()=>{
   ta.remove();
 });
 
-/* ---------- offline ---------- */
+/* ---------- offline + self-update ---------- */
 if('serviceWorker' in navigator){
+  // Only reload on an *update*. On a first visit the controller arrives for the
+  // first time too, and reloading then would be a pointless flash.
+  if(navigator.serviceWorker.controller){
+    let reloading=false;
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{
+      if(reloading)return;
+      reloading=true;
+      location.reload();
+    });
+  }
   window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('sw.js').catch(()=>{});
+    navigator.serviceWorker.register('sw.js').then(reg=>{
+      reg.update().catch(()=>{});
+      // The Android shell restores the last page when the app is resumed rather
+      // than reloading it, so check for a new version whenever it comes forward.
+      document.addEventListener('visibilitychange',()=>{
+        if(!document.hidden)reg.update().catch(()=>{});
+      });
+    }).catch(()=>{});
   });
 }
 </script>
