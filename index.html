@@ -236,7 +236,7 @@ section.chapter{margin-top:52px;scroll-margin-top:150px}
 .entry.hidden{display:none}
 
 .tick{
-  grid-row:1;
+  grid-column:1;grid-row:1;
   width:16px;height:16px;margin-top:4px;padding:0;
   border:1.5px solid var(--line);border-radius:50%;
   background:transparent;cursor:pointer;
@@ -245,7 +245,7 @@ section.chapter{margin-top:52px;scroll-margin-top:150px}
 .tick:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .entry.done .tick{background:var(--accent);border-color:var(--accent)}
 
-.en{min-width:0}
+.en{grid-column:2;grid-row:1;min-width:0}
 .hw{
   display:flex;flex-direction:column;align-items:flex-start;
   font-family:"Zilla Slab",Georgia,serif;
@@ -271,8 +271,8 @@ section.chapter{margin-top:52px;scroll-margin-top:150px}
   font-variant-numeric:tabular-nums;vertical-align:1px;
 }
 
-.tr{margin:9px 0 0;display:grid;gap:4px}
-@media(min-width:760px){.tr{margin:1px 0 0}}
+.tr{grid-column:2;grid-row:2;margin:9px 0 0;display:grid;gap:4px}
+@media(min-width:760px){.tr{grid-column:3;grid-row:1;margin:1px 0 0}}
 .tr-row{display:grid;grid-template-columns:22px minmax(0,1fr);gap:9px;align-items:baseline}
 .tag{
   font-family:"IBM Plex Mono",ui-monospace,monospace;
@@ -284,7 +284,7 @@ section.chapter{margin-top:52px;scroll-margin-top:150px}
 
 /* ---------- example sentence ---------- */
 .ex{
-  grid-column:2 / -1;
+  grid-column:2;grid-row:3;
   margin-top:12px;
   padding:10px 13px;
   background:var(--surface-2);
@@ -296,6 +296,7 @@ section.chapter{margin-top:52px;scroll-margin-top:150px}
 .ex-en{color:var(--ink)}
 .ex-en .speak{margin-left:7px}
 .ex-tr{color:var(--ink-3)}
+@media(min-width:760px){.ex{grid-column:2 / -1;grid-row:2}}
 
 /* hide-mode */
 body.quiz .tr-row p,
