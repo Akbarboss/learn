@@ -139,6 +139,7 @@ h1{font-family:Literata,Georgia,serif;font-weight:600;
   padding:11px 0;border-bottom:1px solid var(--line-soft)}
 .missed .m b{font-family:Literata,Georgia,serif;font-weight:600;font-size:1.02rem}
 .missed .m span{color:var(--ink-3);font-size:.9rem}
+.missed .m .gave{grid-column:1 / -1;font-style:normal;font-size:.86rem;color:var(--bad);margin-top:2px}
 @media(max-width:430px){.missed .m{grid-template-columns:1fr;gap:3px}}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);
   color:var(--bg);font-size:.88rem;padding:11px 18px;border-radius:6px;max-width:90vw;
@@ -492,7 +493,7 @@ function settle(kind, it, byClaude, note, given){
   S.marks[S.i] = kind === "ok" ? true : kind === "hold" ? "hold" : false;
   $("answer").disabled = true;
   if (kind === "ok") S.ok++;
-  else if (kind === "bad") S.wrong.push(it);
+  else if (kind === "bad") S.wrong.push({it: it, given: given});
   // a "hold" is decided after the last question, all of them together
   showVerdict(kind, it, byClaude, note, given);
   drawTrack();
@@ -532,7 +533,7 @@ async function finish(){
     S.pending.forEach((p, k) => {
       const v = verdicts[k];
       if (v && v.verdict === "ok"){ S.ok++; S.marks[p.i] = true; }
-      else if (v && v.verdict === "no"){ S.wrong.push(p.it); S.marks[p.i] = false; }
+      else if (v && v.verdict === "no"){ S.wrong.push({it: p.it, given: p.given}); S.marks[p.i] = false; }
       else { S.unsure.push({en: p.it.w.en, given: p.given}); S.marks[p.i] = "hold"; }
     });
   }
@@ -545,13 +546,19 @@ async function finish(){
 
   const host = $("missed"); host.innerHTML = "";
   const seen = new Set();
-  S.wrong.forEach(it => {
+  const missed = [];
+  S.wrong.forEach(row => {
+    const it = row.it, given = (row.given || "").trim();
     if (seen.has(it.w.en)) return;
     seen.add(it.w.en);
-    const row = document.createElement("div");
-    row.className = "m";
-    row.innerHTML = "<b>" + esc(it.w.en) + "</b><span>" + esc(it.w.ru) + " · " + esc(it.w.uz) + "</span>";
-    host.appendChild(row);
+    missed.push({en: it.w.en, given: given});
+    const el = document.createElement("div");
+    el.className = "m";
+    el.innerHTML = "<b>" + esc(it.w.en) + "</b>" +
+                   "<span>" + esc(it.w.ru) + " · " + esc(it.w.uz) + "</span>" +
+                   (given ? '<em class="gave"></em>' : "");
+    if (given) el.querySelector(".gave").textContent = "вы: " + given;
+    host.appendChild(el);
   });
   view("vDone");
 
@@ -559,7 +566,7 @@ async function finish(){
     await fetch("/api/result", {
       method: "POST", headers: {"Content-Type": "application/json"},
       body: JSON.stringify({who: S.who, total: total, ok: S.ok,
-                            missed: [...seen], unsure: S.unsure}),
+                            missed: missed, unsure: S.unsure}),
     });
   }catch(e){ toast("Result not saved — the computer did not answer"); }
 }

@@ -577,8 +577,17 @@ def results_page():
                 esc(r.get('who')), esc(r.get('at', '')), ok, total, pct))
         missed = r.get('missed') or []
         if missed:
-            body.append('<p class="m">Missed: %s</p>' %
-                        esc(', '.join(str(x) for x in missed)))
+            body.append('<p class="m">Missed:</p><ul>')
+            for x in missed:
+                # newer runs store {en, given}; older files hold plain words
+                if isinstance(x, dict):
+                    gave = (x.get('given') or '').strip()
+                    body.append('<li>%s%s</li>' % (
+                        esc(x.get('en', '')),
+                        ' &mdash; answered <b>%s</b>' % esc(gave) if gave else ''))
+                else:
+                    body.append('<li>%s</li>' % esc(x))
+            body.append('</ul>')
         unsure = r.get('unsure') or []
         if unsure:
             body.append('<p class="u"><b>Needs your eye</b> (no Claude verdict):</p><ul>')
