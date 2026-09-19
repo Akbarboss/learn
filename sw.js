@@ -5,7 +5,7 @@
      - Google Fonts : cache first — they never change.
    Bump VERSION when you want to throw away every old cache. */
 
-const VERSION = 'v4';
+const VERSION = 'v5';
 const CACHE   = 'wordbook-' + VERSION;
 const SHELL   = ['./', './index.html', './sync-config.js', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 

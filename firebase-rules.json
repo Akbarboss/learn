@@ -1,5 +1,10 @@
 {
   "rules": {
+    "_exam": {
+      ".read": true,
+      ".write": true,
+      ".validate": "!newData.exists() || (newData.hasChildren(['by','heartbeat']) && (newData.child('by').val() === 'Akbar' || newData.child('by').val() === 'Abror' || newData.child('by').val() === 'Muhammadali'))"
+    },
     "$learner": {
       ".read": "$learner === 'Akbar' || $learner === 'Abror' || $learner === 'Muhammadali'",
       ".write": "$learner === 'Akbar' || $learner === 'Abror' || $learner === 'Muhammadali'"
