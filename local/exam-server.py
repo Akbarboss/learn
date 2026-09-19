@@ -180,9 +180,8 @@ def judge_prompt(item, given):
         direction = ('The learner saw the English word and had to give its meaning '
                      'in Russian or Uzbek.')
     else:
-        shown = 'Russian' if item.get('show') == 'ru' else 'Uzbek'
-        direction = ('The learner saw the %s translation and had to give the '
-                     'English word.' % shown)
+        direction = ('The learner saw both the Russian and the Uzbek translation '
+                     'and had to give the English word.')
     return JUDGE_PROMPT.format(direction=direction, en=item['en'], ru=item['ru'],
                                uz=item['uz'], given=given)
 
@@ -208,8 +207,8 @@ def batch_rows(items):
         if it.get('dir') == 1:
             asked = 'shown the English word, had to answer in Russian or Uzbek'
         else:
-            asked = ('shown the %s translation, had to answer in English'
-                     % ('Russian' if it.get('show') == 'ru' else 'Uzbek'))
+            asked = ('shown the Russian and the Uzbek translation together, '
+                     'had to answer in English')
         out.append(
             '%d. English: %s | Russian: %s | Uzbek: %s\n'
             '   asked: %s\n'
