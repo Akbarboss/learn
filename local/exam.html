@@ -139,7 +139,8 @@ h1{font-family:Literata,Georgia,serif;font-weight:600;
   padding:11px 0;border-bottom:1px solid var(--line-soft)}
 .missed .m b{font-family:Literata,Georgia,serif;font-weight:600;font-size:1.02rem}
 .missed .m span{color:var(--ink-3);font-size:.9rem}
-.missed .m .gave{grid-column:1 / -1;font-style:normal;font-size:.86rem;color:var(--bad);margin-top:2px}
+.missed .m .gave{grid-column:1 / -1;font-style:normal;font-size:.86rem;color:var(--bad);
+  margin-top:3px;font-variant-numeric:tabular-nums;white-space:pre-wrap}
 @media(max-width:430px){.missed .m{grid-template-columns:1fr;gap:3px}}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);
   color:var(--bg);font-size:.88rem;padding:11px 18px;border-radius:6px;max-width:90vw;
@@ -545,19 +546,34 @@ async function finish(){
     (S.wrong.length ? "Worth another look:" : S.unsure.length ? "" : "Every answer correct.");
 
   const host = $("missed"); host.innerHTML = "";
-  const seen = new Set();
-  const missed = [];
+  // A word is asked once each way, so it can be missed twice — with two
+  // different answers. Group by word and list every attempt; dropping the
+  // second one hid half the mistakes.
+  const byWord = new Map();
   S.wrong.forEach(row => {
-    const it = row.it, given = (row.given || "").trim();
-    if (seen.has(it.w.en)) return;
-    seen.add(it.w.en);
-    missed.push({en: it.w.en, given: given});
+    const it = row.it;
+    if (!byWord.has(it.w.en)) byWord.set(it.w.en, {it: it, tries: []});
+    byWord.get(it.w.en).tries.push({dir: it.dir, given: (row.given || "").trim()});
+  });
+
+  const missed = [];
+  byWord.forEach(entry => {
+    const it = entry.it;
+    missed.push({
+      en: it.w.en,
+      given: entry.tries.map(t => t.given || "—").join("  /  "),
+    });
     const el = document.createElement("div");
     el.className = "m";
     el.innerHTML = "<b>" + esc(it.w.en) + "</b>" +
-                   "<span>" + esc(it.w.ru) + " · " + esc(it.w.uz) + "</span>" +
-                   (given ? '<em class="gave"></em>' : "");
-    if (given) el.querySelector(".gave").textContent = "вы: " + given;
+                   "<span>" + esc(it.w.ru) + " · " + esc(it.w.uz) + "</span>";
+    entry.tries.forEach(t => {
+      const em = document.createElement("em");
+      em.className = "gave";
+      em.textContent = (t.dir === 1 ? "EN→RU/UZ" : "RU/UZ→EN") + "   " +
+                       (t.given ? "вы: " + t.given : "без ответа");
+      el.appendChild(em);
+    });
     host.appendChild(el);
   });
   view("vDone");
