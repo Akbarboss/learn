@@ -3,15 +3,6 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-
-    <!-- Needed on Android 11+ so SpeechRecognizer can see the system speech
-         service; without it recognition just reports that none is installed. -->
-    <queries>
-        <intent>
-            <action android:name="android.speech.RecognitionService"/>
-        </intent>
-    </queries>
 
     <application
         android:allowBackup="true"
