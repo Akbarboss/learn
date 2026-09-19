@@ -29,11 +29,12 @@ import http.server
 import json
 import os
 import re
+import shutil
 import socket
 import socketserver
 import ssl
+import subprocess
 import sys
-import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -66,6 +67,33 @@ def io_open(path, mode='r'):
 
 
 API_KEY = read_key()
+
+
+def find_cli():
+    """The Claude Code command line, if it is installed on this machine."""
+    named = os.environ.get('EXAM_CLAUDE_CLI', '').strip()
+    if named and os.path.exists(named):
+        return named
+    found = shutil.which('claude')
+    if found:
+        return found
+    appdata = os.environ.get('APPDATA', '')
+    for name in ('claude.cmd', 'claude.exe', 'claude'):
+        guess = os.path.join(appdata, 'npm', name)
+        if appdata and os.path.exists(guess):
+            return guess
+    return ''
+
+
+CLAUDE_CLI = find_cli()
+CLI_NOT_LOGGED_IN = False     # set once, so the console is not spammed
+
+
+def cli_argv():
+    """A .cmd needs cmd.exe to start it; a real executable does not."""
+    if os.name == 'nt' and CLAUDE_CLI.lower().endswith(('.cmd', '.bat')):
+        return [os.environ.get('COMSPEC', 'cmd.exe'), '/c', CLAUDE_CLI]
+    return [CLAUDE_CLI]
 
 
 def lan_ip():
@@ -144,11 +172,7 @@ JUDGE_PROMPT = (
 )
 
 
-def ask_claude(item, given):
-    """Returns (ok, note) or (None, reason) when no verdict could be had."""
-    if not API_KEY:
-        return None, 'nokey'
-
+def judge_prompt(item, given):
     if item.get('dir') == 1:
         direction = ('The learner saw the English word and had to give its meaning '
                      'in Russian or Uzbek.')
@@ -156,15 +180,62 @@ def ask_claude(item, given):
         shown = 'Russian' if item.get('show') == 'ru' else 'Uzbek'
         direction = ('The learner saw the %s translation and had to give the '
                      'English word.' % shown)
+    return JUDGE_PROMPT.format(direction=direction, en=item['en'], ru=item['ru'],
+                               uz=item['uz'], given=given)
 
+
+def read_verdict(text):
+    """Pull {"ok": ..., "note": ...} out of whatever came back."""
+    m = re.search(r'\{.*\}', text or '', re.S)
+    if not m:
+        return None, 'unparsed'
+    try:
+        got = json.loads(m.group(0))
+    except Exception:
+        return None, 'unparsed'
+    if not isinstance(got.get('ok'), bool):
+        return None, 'unparsed'
+    return got['ok'], str(got.get('note') or '')
+
+
+def ask_via_cli(prompt):
+    """Ask through the Claude Code command line — uses the subscription, no key.
+    The prompt goes in on stdin so nothing has to survive shell quoting."""
+    global CLI_NOT_LOGGED_IN
+    if CLI_NOT_LOGGED_IN:
+        return None, 'cli_logged_out'
+    try:
+        p = subprocess.run(cli_argv() + ['-p'], input=prompt,
+                           capture_output=True, text=True, encoding='utf-8',
+                           errors='replace', timeout=120)
+    except subprocess.TimeoutExpired:
+        return None, 'cli_timeout'
+    except Exception as e:
+        print('  [judge] cli: %s' % e)
+        return None, 'cli_failed'
+
+    out = (p.stdout or '') + (p.stderr or '')
+    if 'Not logged in' in out or '/login' in out:
+        CLI_NOT_LOGGED_IN = True
+        print('')
+        print('  !! The Claude command line is not logged in.')
+        print('     Open a terminal, run:  claude')
+        print('     then type:  /login   — once, then restart this server.')
+        print('     Until then answers the dictionary cannot place are put aside.')
+        print('')
+        return None, 'cli_logged_out'
+    if p.returncode != 0 and not p.stdout:
+        return None, 'cli_failed'
+    return read_verdict(p.stdout)
+
+
+def ask_via_api(prompt):
     body = json.dumps({
         'model': MODEL,
         'max_tokens': 200,
         'messages': [{
             'role': 'user',
-            'content': JUDGE_PROMPT.format(
-                direction=direction, en=item['en'], ru=item['ru'],
-                uz=item['uz'], given=given),
+            'content': prompt,
         }],
     }).encode('utf-8')
 
@@ -188,16 +259,39 @@ def ask_claude(item, given):
     for block in payload.get('content', []):
         if block.get('type') == 'text':
             text += block.get('text', '')
-    m = re.search(r'\{.*\}', text, re.S)
-    if not m:
-        return None, 'unparsed'
-    try:
-        got = json.loads(m.group(0))
-    except Exception:
-        return None, 'unparsed'
-    if not isinstance(got.get('ok'), bool):
-        return None, 'unparsed'
-    return got['ok'], str(got.get('note') or '')
+    return read_verdict(text)
+
+
+# Identical (word, answer) pairs come round often — ask once.
+_verdicts = {}
+
+
+def ask_claude(item, given):
+    """A verdict, or (None, reason) when none could be had.
+
+    The command line goes first: it spends the subscription this machine is
+    already paying for. An API key is only used when there is no command
+    line. When neither answers, the caller must put the answer aside rather
+    than call it wrong.
+    """
+    cache_key = (item.get('en'), item.get('dir'), given.strip().lower())
+    if cache_key in _verdicts:
+        return _verdicts[cache_key]
+
+    prompt = judge_prompt(item, given)
+    if CLAUDE_CLI and not CLI_NOT_LOGGED_IN:
+        ok, note = ask_via_cli(prompt)
+        if ok is not None:
+            _verdicts[cache_key] = (ok, note)
+            return ok, note
+        if note != 'cli_logged_out':
+            return None, note          # a real failure: do not fall through
+    if API_KEY:
+        ok, note = ask_via_api(prompt)
+        if ok is not None:
+            _verdicts[cache_key] = (ok, note)
+        return ok, note
+    return None, 'nojudge'
 
 
 def save_result(rec):
@@ -259,7 +353,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
         if path == '/api/words':
             return self._send(200, {'words': WORDS, 'people': PEOPLE,
-                                    'claude': bool(API_KEY)})
+                                    'claude': bool(CLAUDE_CLI or API_KEY)})
 
         if path == '/api/learned':
             who = query.get('who', '')
@@ -372,9 +466,15 @@ def main():
     print('  Red Tide test server')
     print('  ' + '-' * 46)
     print('  words loaded    %d' % len(WORDS))
-    print('  marking         %s' % (
-        'Claude (%s)' % MODEL if API_KEY else
-        'dictionary only - no API key, unclear answers go to /results'))
+    if CLAUDE_CLI:
+        print('  marking         Claude Code  (%s)' % CLAUDE_CLI)
+        print('                  no API key needed - it uses your subscription')
+    elif API_KEY:
+        print('  marking         Anthropic API  (%s)' % MODEL)
+    else:
+        print('  marking         dictionary only')
+        print('                  answers it cannot place are put aside for you,')
+        print('                  never marked wrong. See /results.')
     print('')
     print('  On the phone open:   http://%s:%d' % (ip, PORT))
     print('  Results for you:     http://%s:%d/results' % (ip, PORT))
