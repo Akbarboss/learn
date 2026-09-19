@@ -89,7 +89,18 @@ def find_cli():
 
 CLAUDE_CLI = find_cli()
 NEUTRAL_DIR = tempfile.mkdtemp(prefix='wordbook-judge-')
-CLI_NOT_LOGGED_IN = False     # set once, so the console is not spammed
+CLI_NOT_LOGGED_IN = False     # False, or the time we last saw "not logged in"
+LOGOUT_RETRY = 60             # seconds before trying the command line again
+
+
+def cli_usable():
+    """Retry a minute after a logged-out reply, so logging in takes effect
+    without restarting the server."""
+    if not CLAUDE_CLI:
+        return False
+    if not CLI_NOT_LOGGED_IN:
+        return True
+    return (time.time() - CLI_NOT_LOGGED_IN) > LOGOUT_RETRY
 
 
 def cli_argv():
@@ -253,7 +264,7 @@ def judge_many(items):
         return []
     prompt = BATCH_PROMPT.format(n=len(items), rows=batch_rows(items))
     text = ''
-    if CLAUDE_CLI and not CLI_NOT_LOGGED_IN:
+    if cli_usable():
         text, _ = cli_raw(prompt)
     if not text and API_KEY:
         text, _ = api_raw(prompt)
@@ -283,7 +294,7 @@ def cli_raw(prompt):
     multilingual prompt never has to survive Windows shell quoting.
     """
     global CLI_NOT_LOGGED_IN
-    if CLI_NOT_LOGGED_IN:
+    if not cli_usable():
         return '', 'cli_logged_out'
     try:
         p = subprocess.run(cli_argv() + ['--strict-mcp-config', '-p'],
@@ -297,17 +308,23 @@ def cli_raw(prompt):
         return '', 'cli_failed'
 
     out = (p.stdout or '') + (p.stderr or '')
-    if 'Not logged in' in out or '/login' in out:
-        CLI_NOT_LOGGED_IN = True
-        print('')
-        print('  !! The Claude command line is not logged in.')
-        print('     Open a terminal, run:  claude')
-        print('     then type:  /login   — once, then restart this server.')
-        print('     Until then answers the dictionary cannot place are put aside.')
-        print('')
+    # Only a failed run that actually says so counts as logged out. Matching a
+    # bare "/login" anywhere in the output was catching ordinary CLI notices
+    # and then every later answer came back unjudged.
+    if p.returncode != 0 and 'Not logged in' in out:
+        if not CLI_NOT_LOGGED_IN:
+            print('')
+            print('  !! The Claude command line is not logged in.')
+            print('     Open a terminal, run:  claude')
+            print('     then type:  /login   — once. No need to restart this server.')
+            print('     Until then answers the dictionary cannot place are put aside.')
+            print('')
+        CLI_NOT_LOGGED_IN = time.time()
         return '', 'cli_logged_out'
     if p.returncode != 0 and not p.stdout:
+        print('  [judge] cli exited %s: %s' % (p.returncode, out.strip()[:160]))
         return '', 'cli_failed'
+    CLI_NOT_LOGGED_IN = False        # a good answer clears any earlier doubt
     return (p.stdout or ''), ''
 
 
@@ -375,7 +392,7 @@ def ask_claude(item, given):
         return _verdicts[cache_key]
 
     prompt = judge_prompt(item, given)
-    if CLAUDE_CLI and not CLI_NOT_LOGGED_IN:
+    if cli_usable():
         ok, note = ask_via_cli(prompt)
         if ok is not None:
             _verdicts[cache_key] = (ok, note)
@@ -575,6 +592,10 @@ class Server(socketserver.ThreadingTCPServer):
 
 
 def main():
+    try:                                   # otherwise Python buffers and the
+        sys.stdout.reconfigure(line_buffering=True)   # console stays blank
+    except Exception:
+        pass
     ip = lan_ip()
     print('')
     print('  Red Tide test server')
