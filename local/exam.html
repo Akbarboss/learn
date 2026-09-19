@@ -80,6 +80,12 @@ h1{font-family:Literata,Georgia,serif;font-weight:600;
   font-variant-numeric:tabular-nums}
 .fieldlabel{font-family:"IBM Plex Mono",monospace;font-size:.7rem;letter-spacing:.11em;
   text-transform:uppercase;color:var(--ink-3);margin:0 0 10px}
+.countrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+.countrow input{width:110px;font:inherit;font-size:1.05rem;padding:11px 13px;
+  background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:6px;
+  font-variant-numeric:tabular-nums}
+.countrow input:focus-visible{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+.countrow span{font-size:.88rem;color:var(--ink-3)}
 .qcard{display:grid;gap:20px}
 .asked{font-family:"IBM Plex Mono",monospace;font-size:.71rem;letter-spacing:.11em;
   text-transform:uppercase;color:var(--accent);margin:0}
@@ -119,6 +125,8 @@ h1{font-family:Literata,Georgia,serif;font-weight:600;
 .right{margin:0;font-size:.95rem;color:var(--ink-2)}
 .right b{color:var(--ink);font-weight:600}
 .right .lang{font-family:"IBM Plex Mono",monospace;font-size:.66rem;color:var(--ink-3);margin-right:6px}
+.right.yours{padding-bottom:7px;border-bottom:1px solid var(--line);margin-bottom:2px}
+.right.yours b{font-weight:500}
 .note{margin:0;font-size:.88rem;color:var(--ink-2);font-style:italic}
 .dots{display:inline-flex;gap:4px}
 .dots i{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.3;animation:b 1.1s infinite}
@@ -159,6 +167,13 @@ h1{font-family:Literata,Georgia,serif;font-weight:600;
 
     <p class="fieldlabel">Start from</p>
     <div class="row" id="pickFirst" style="margin-bottom:22px"></div>
+
+    <p class="fieldlabel">How many of the newest words</p>
+    <div class="countrow">
+      <input id="howMany" type="number" min="1" step="1" inputmode="numeric"
+             placeholder="all" aria-label="How many of the most recently ticked words">
+      <span id="countNote"></span>
+    </div>
 
     <div class="row">
       <button class="btn primary" id="startBtn" disabled>Start</button>
@@ -305,6 +320,27 @@ function drawPick(){
   });
 }
 
+function wantedCount(){
+  const raw = ($("howMany").value || "").trim();
+  if (!raw) return 0;                       // blank means every ticked word
+  const n = parseInt(raw, 10);
+  return (isNaN(n) || n < 1) ? 0 : n;
+}
+function updateStart(){
+  const have = S.list.length;
+  const want = wantedCount();
+  const use = want ? Math.min(want, have) : have;
+  const note = $("countNote");
+  $("startBtn").disabled = use === 0;
+  $("startBtn").textContent = use
+    ? "Start — " + use + " words, " + (use * 2) + " questions"
+    : "Start";
+  if (!have) note.textContent = "";
+  else if (!want) note.textContent = "all " + have + " ticked words";
+  else if (want >= have) note.textContent = "only " + have + " ticked so far — all of them";
+  else note.textContent = "the " + use + " most recently ticked";
+}
+
 async function choose(name){
   S.who = name; S.list = [];
   drawPick();
@@ -319,12 +355,10 @@ async function choose(name){
       toast("Could not reach the wordbook database — try again in a moment");
       return;
     }
+    // the server hands these back newest tick first, so "the last 15" is a slice
     S.list = d.indices.map(i => WORDS[i]).filter(Boolean);
     hint.textContent = S.list.length + " ticked";
-    $("startBtn").disabled = S.list.length === 0;
-    $("startBtn").textContent = S.list.length
-      ? "Start — " + S.list.length + " words, " + (S.list.length * 2) + " questions"
-      : "Start";
+    updateStart();
     if (!S.list.length) toast(name + " has not ticked any words yet");
   }catch(e){
     hint.textContent = "failed";
@@ -340,9 +374,14 @@ function shuffle(a){
   return a;
 }
 
+$("howMany").addEventListener("input", updateStart);
+
 $("startBtn").addEventListener("click", () => {
   if (!S.who || !S.list.length) return;
-  const pool = shuffle(S.list.slice()).map(r => ({en:r[0], ru:r[1], uz:r[2]}));
+  const want = wantedCount();
+  // S.list is newest-ticked first, so slicing the front takes the newest
+  const chosen = want ? S.list.slice(0, want) : S.list;
+  const pool = shuffle(chosen.slice()).map(r => ({en:r[0], ru:r[1], uz:r[2]}));
   const toTr = pool.map(w => ({w, dir:1}));                  // English → ru / uz
   const toEn = shuffle(pool.slice()).map(w => ({w, dir:2}));  // ru + uz → English
   S.queue = S.first === "tr" ? toEn.concat(toTr) : toTr.concat(toEn);
@@ -392,7 +431,7 @@ function drawQ(){
   a.focus();
 }
 
-function showVerdict(kind, it, byClaude, note){
+function showVerdict(kind, it, byClaude, note, given){
   const box = document.createElement("div");
   box.className = "verdict " + kind;
   const head = document.createElement("div");
@@ -406,6 +445,16 @@ function showVerdict(kind, it, byClaude, note){
     head.appendChild(t);
   }
   box.appendChild(head);
+
+  // what he actually wrote, so the two can be compared side by side
+  if (given && String(given).trim()){
+    const mine = document.createElement("p");
+    mine.className = "right yours";
+    mine.innerHTML = '<span class="lang">ВЫ</span><b></b>';
+    mine.querySelector("b").textContent = given;
+    box.appendChild(mine);
+  }
+
   const right = document.createElement("p");
   right.className = "right";
   right.innerHTML = it.dir === 1
@@ -445,7 +494,7 @@ function settle(kind, it, byClaude, note, given){
   if (kind === "ok") S.ok++;
   else if (kind === "bad") S.wrong.push(it);
   // a "hold" is decided after the last question, all of them together
-  showVerdict(kind, it, byClaude, note);
+  showVerdict(kind, it, byClaude, note, given);
   drawTrack();
   $("go").textContent = (S.i + 1 >= S.queue.length) ? "See the result" : "Next";
   $("go").focus();
