@@ -365,7 +365,10 @@ function drawTrack(){
 function drawQ(){
   const it = S.queue[S.i];
   S.locked = false; S.busy = false;
-  $("pos").textContent = "Round " + it.dir + " · " + (S.i + 1) + "/" + S.queue.length;
+  // show the queue building up, so a "Claude проверит" card reads as a promise
+  // the test is keeping rather than as something that failed
+  const waiting = S.pending.length ? "  ·  " + S.pending.length + " → Claude" : "";
+  $("pos").textContent = "Round " + it.dir + " · " + (S.i + 1) + "/" + S.queue.length + waiting;
   drawTrack();
   $("slot").innerHTML = "";
   const a = $("answer"); a.value = ""; a.disabled = false;
@@ -395,7 +398,7 @@ function showVerdict(kind, it, byClaude, note){
   const head = document.createElement("div");
   head.className = "vhead";
   head.textContent = kind === "ok" ? "✓ To‘g‘ri · Верно"
-    : kind === "hold" ? "⚑ Otlozheno · Отложено"
+    : kind === "hold" ? "⏳ Claude tekshiradi · Claude проверит"
     : "✕ Noto‘g‘ri · Неверно";
   if (byClaude){
     const t = document.createElement("span");
@@ -432,7 +435,7 @@ async function check(){
   // goes on a list and the whole list is judged in one call at the end.
   S.pending.push({i: S.i, it: it, given: given});
   settle("hold", it, false,
-    "Проверим в конце — не считается ошибкой", given);
+    "Нет в словаре — Claude решит после последнего вопроса. Ошибкой не считается.", given);
 }
 
 function settle(kind, it, byClaude, note, given){
