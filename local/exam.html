@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Red Tide test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  color-scheme:light dark;
+  --bg:#EEF1F5; --surface:#FFFFFF; --surface-2:#F5F7FA;
+  --ink:#141A22; --ink-2:#4A5768; --ink-3:#7C8A9C;
+  --line:#D6DDE6; --line-soft:#E6EBF1;
+  --accent:#2B4C8C; --accent-soft:#DFE6F3;
+  --ok:#1B6B48; --ok-soft:#DCEFE4;
+  --bad:#A8322F; --bad-soft:#F6E2E1;
+  --warm:#9A5A14; --warm-soft:#F6EAD9;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#10141A; --surface:#181E27; --surface-2:#1E2631;
+    --ink:#E6EBF2; --ink-2:#9AAABE; --ink-3:#6C7D92;
+    --line:#252E3A; --line-soft:#1D2530;
+    --accent:#7FA8E8; --accent-soft:#1B2740;
+    --ok:#5FC291; --ok-soft:#142A21;
+    --bad:#EF8A86; --bad-soft:#2E1917;
+    --warm:#E0A46A; --warm-soft:#2A1F12;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:620px;margin:0 auto;padding-inline:20px;padding-block:0 60px}
+.bar{
+  position:sticky;top:0;z-index:10;background:var(--bg);
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  padding-block:13px;margin-bottom:26px;
+}
+.who{font-family:"IBM Plex Mono",monospace;font-size:.72rem;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink-3)}
+.who b{color:var(--ink-2);font-weight:500}
+.grow{flex:1}
+.pos{font-family:"IBM Plex Mono",monospace;font-size:.74rem;color:var(--ink-2);
+  font-variant-numeric:tabular-nums}
+.track{display:flex;gap:3px;width:100%}
+.seg{height:3px;flex:1;background:var(--line);border-radius:2px}
+.seg.done{background:var(--accent)} .seg.miss{background:var(--bad)}
+.seg.hold{background:var(--warm)} .seg.now{background:var(--ink-3)}
+h1{font-family:Literata,Georgia,serif;font-weight:600;
+  font-size:clamp(1.8rem,5.4vw,2.4rem);line-height:1.13;letter-spacing:-.018em;
+  margin:0 0 10px;text-wrap:balance}
+.lede{color:var(--ink-2);margin:0 0 4px;max-width:58ch}
+.sub{color:var(--ink-3);font-size:.89rem;margin:0 0 24px;max-width:58ch}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:.7rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-3);margin:0 0 14px}
+.btn{font:inherit;font-size:.92rem;padding:10px 18px;border-radius:5px;cursor:pointer;
+  background:var(--surface);color:var(--ink-2);border:1px solid var(--line)}
+.btn:hover{color:var(--ink);border-color:var(--ink-3)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.btn[disabled]{opacity:.5;cursor:default}
+.row{display:flex;gap:9px;flex-wrap:wrap}
+.pick{display:grid;gap:9px;margin:0 0 22px}
+.pick button{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+  font:inherit;font-size:1.08rem;text-align:left;cursor:pointer;padding:15px 18px;
+  border-radius:6px;background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.pick button:hover{border-color:var(--accent);color:var(--accent)}
+.pick button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);
+  color:var(--accent);font-weight:500}
+.pick .hint{font-family:"IBM Plex Mono",monospace;font-size:.72rem;color:var(--ink-3);
+  font-variant-numeric:tabular-nums}
+.qcard{display:grid;gap:20px}
+.asked{font-family:"IBM Plex Mono",monospace;font-size:.71rem;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--accent);margin:0}
+.word{font-family:Literata,Georgia,serif;font-weight:600;
+  font-size:clamp(1.9rem,7vw,2.8rem);line-height:1.14;letter-spacing:-.02em;
+  margin:0;text-wrap:balance}
+.answer{display:flex;gap:9px}
+.answer input{flex:1;min-width:0;font:inherit;font-size:1.08rem;padding:13px 15px;
+  background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:6px}
+.answer input:focus-visible{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+.answer input:disabled{opacity:.65}
+.mic{flex:none;width:50px;display:grid;place-items:center;cursor:pointer;background:var(--surface);
+  border:1px solid var(--line);border-radius:6px;color:var(--accent)}
+.mic svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round}
+.mic[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+.verdict{padding:15px 17px;border-radius:6px;display:grid;gap:7px}
+.verdict.ok{background:var(--ok-soft);border:1px solid var(--ok)}
+.verdict.bad{background:var(--bad-soft);border:1px solid var(--bad)}
+.verdict.hold{background:var(--warm-soft);border:1px solid var(--warm)}
+.verdict.think{background:var(--surface-2);border:1px solid var(--line)}
+.vhead{font-weight:600;font-size:1.02rem;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.verdict.ok .vhead{color:var(--ok)}
+.verdict.bad .vhead{color:var(--bad)}
+.verdict.hold .vhead{color:var(--warm)}
+.verdict.think .vhead{color:var(--ink-2)}
+.tagwho{font-family:"IBM Plex Mono",monospace;font-size:.62rem;letter-spacing:.08em;
+  text-transform:uppercase;font-weight:500;padding:3px 7px;border-radius:3px;
+  background:var(--warm-soft);color:var(--warm)}
+.right{margin:0;font-size:.95rem;color:var(--ink-2)}
+.right b{color:var(--ink);font-weight:600}
+.right .lang{font-family:"IBM Plex Mono",monospace;font-size:.66rem;color:var(--ink-3);margin-right:6px}
+.note{margin:0;font-size:.88rem;color:var(--ink-2);font-style:italic}
+.dots{display:inline-flex;gap:4px}
+.dots i{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.3;animation:b 1.1s infinite}
+.dots i:nth-child(2){animation-delay:.18s} .dots i:nth-child(3){animation-delay:.36s}
+@keyframes b{0%,60%,100%{opacity:.25}30%{opacity:1}}
+.scoreline{font-family:"IBM Plex Mono",monospace;font-size:2.4rem;font-variant-numeric:tabular-nums;
+  color:var(--accent);margin:4px 0 2px;letter-spacing:-.02em}
+.missed{margin-top:22px;border-top:1px solid var(--line)}
+.missed .m{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:14px;
+  padding:11px 0;border-bottom:1px solid var(--line-soft)}
+.missed .m b{font-family:Literata,Georgia,serif;font-weight:600;font-size:1.02rem}
+.missed .m span{color:var(--ink-3);font-size:.9rem}
+@media(max-width:430px){.missed .m{grid-template-columns:1fr;gap:3px}}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);
+  color:var(--bg);font-size:.88rem;padding:11px 18px;border-radius:6px;max-width:90vw;
+  opacity:0;pointer-events:none;transition:opacity .2s;z-index:50}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="bar">
+    <span class="who" id="whoLabel">Red Tide &nbsp;&middot;&nbsp; test</span>
+    <span class="grow"></span>
+    <span class="pos" id="pos"></span>
+    <button class="btn" id="quitBtn" hidden>Stop</button>
+    <div class="track" id="track" hidden></div>
+  </header>
+
+  <section id="vSetup">
+    <p class="eyebrow" id="loadNote">Loading&hellip;</p>
+    <h1>Who is answering?</h1>
+    <p class="lede">Round one: the English word, answer in Russian or Uzbek. Round two turns it around &mdash; the translation is shown, answer in English.</p>
+    <p class="sub">Sinov ikki bosqichda. &nbsp;&middot;&nbsp; Проверка в два круга.</p>
+    <div class="pick" id="pickWho"></div>
+    <div class="row">
+      <button class="btn primary" id="startBtn" disabled>Start</button>
+    </div>
+    <p class="sub" style="margin-top:22px" id="judgeNote"></p>
+  </section>
+
+  <section id="vAsk" hidden>
+    <div class="qcard">
+      <p class="asked" id="asked"></p>
+      <h2 class="word" id="word"></h2>
+      <div class="answer">
+        <input id="answer" type="text" autocomplete="off" autocapitalize="off"
+               autocorrect="off" spellcheck="false" aria-label="Your answer">
+        <button class="mic" id="mic" type="button" aria-pressed="false"
+                aria-label="Answer out loud" title="Answer out loud" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg>
+        </button>
+      </div>
+      <div id="slot"></div>
+      <div class="row">
+        <button class="btn primary" id="go">Check</button>
+        <button class="btn" id="dunno">I don&rsquo;t know</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="vDone" hidden>
+    <p class="eyebrow" id="doneWho"></p>
+    <h1>Test finished</h1>
+    <p class="scoreline" id="score"></p>
+    <p class="lede" id="doneLine"></p>
+    <div class="missed" id="missed"></div>
+    <div class="row" style="margin-top:26px">
+      <button class="btn primary" id="againBtn">Test again</button>
+    </div>
+  </section>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+let WORDS = [], PEOPLE = [], HAS_CLAUDE = false;
+const S = {who:null, list:[], queue:[], i:0, ok:0, wrong:[], unsure:[], marks:[],
+           locked:false, busy:false};
+
+/* ---- answer matching: the same forgiving local check, then the server ---- */
+function norm(t, lang){
+  let s = String(t == null ? "" : t).toLowerCase();
+  s = s.replace(/\([^)]*\)/g, " ");
+  s = s.replace(/[‘’ʻʼ`´′]/g, "'");
+  s = s.replace(/ё/g, "е");
+  s = s.replace(/[.,!?;:"«»\[\]—–…]/g, " ");
+  s = s.replace(/\s+/g, " ").trim();
+  if (lang === "en") s = s.replace(/^(to|a|an|the)\s+/, "");
+  return s;
+}
+function variants(t, lang){
+  const out = new Set(), whole = norm(t, lang);
+  if (whole) out.add(whole);
+  String(t == null ? "" : t).split(/[,;\/]|или|\byoki\b/).forEach(p => {
+    const v = norm(p, lang); if (v) out.add(v);
+  });
+  return [...out];
+}
+function lev(a, b){
+  const m = a.length, n = b.length;
+  if (!m) return n; if (!n) return m;
+  let prev = Array.from({length:n+1}, (_,j) => j), cur = new Array(n+1);
+  for (let i = 1; i <= m; i++){
+    cur[0] = i;
+    for (let j = 1; j <= n; j++)
+      cur[j] = Math.min(prev[j]+1, cur[j-1]+1, prev[j-1] + (a[i-1] === b[j-1] ? 0 : 1));
+    const t = prev; prev = cur; cur = t;
+  }
+  return prev[n];
+}
+function near(a, b){
+  if (a === b) return true;
+  if (Math.abs(a.length - b.length) > 2) return false;
+  const tol = a.length <= 4 ? 0 : a.length <= 8 ? 1 : 2;
+  return lev(a, b) <= tol;
+}
+function localHit(given, expected, lang){
+  const g = norm(given, lang);
+  if (!g) return false;
+  for (const t of expected) for (const v of variants(t, lang)) if (near(g, v)) return true;
+  return false;
+}
+
+/* ---- boot ---- */
+function toast(m){
+  const t = $("toast"); t.textContent = m; t.classList.add("on");
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("on"), 3000);
+}
+function view(v){ ["vSetup","vAsk","vDone"].forEach(x => { $(x).hidden = (x !== v); }); }
+function esc(s){ return String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+
+(async function boot(){
+  try{
+    const r = await fetch("/api/words");
+    const d = await r.json();
+    WORDS = d.words; PEOPLE = d.people; HAS_CLAUDE = d.claude;
+  }catch(e){
+    $("loadNote").textContent = "Cannot reach the computer running the test.";
+    return;
+  }
+  $("loadNote").textContent = "The Mentalist S1 E3 · " + WORDS.length + " words";
+  $("judgeNote").textContent = HAS_CLAUDE
+    ? "Claude marks the answers, so a correct synonym that is not in the dictionary still counts."
+    : "No API key on the computer, so answers are checked against the dictionary. Anything it cannot judge is saved for Akbar to look at, not marked wrong.";
+  drawPick();
+})();
+
+function drawPick(){
+  const host = $("pickWho");
+  host.innerHTML = "";
+  PEOPLE.forEach(name => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.setAttribute("aria-pressed", S.who === name ? "true" : "false");
+    b.innerHTML = '<span>' + name + '</span><span class="hint" data-for="' + name + '"></span>';
+    b.addEventListener("click", () => choose(name));
+    host.appendChild(b);
+  });
+}
+
+async function choose(name){
+  S.who = name; S.list = [];
+  drawPick();
+  $("startBtn").disabled = true;
+  const hint = document.querySelector('.hint[data-for="' + name + '"]');
+  hint.textContent = "loading…";
+  try{
+    const r = await fetch("/api/learned?who=" + encodeURIComponent(name));
+    const d = await r.json();
+    if (d.offline){
+      hint.textContent = "offline";
+      toast("Could not reach the wordbook database — try again in a moment");
+      return;
+    }
+    S.list = d.indices.map(i => WORDS[i]).filter(Boolean);
+    hint.textContent = S.list.length + " ticked";
+    $("startBtn").disabled = S.list.length === 0;
+    $("startBtn").textContent = S.list.length
+      ? "Start — " + S.list.length + " words, " + (S.list.length * 2) + " questions"
+      : "Start";
+    if (!S.list.length) toast(name + " has not ticked any words yet");
+  }catch(e){
+    hint.textContent = "failed";
+    toast("Could not load the ticked words");
+  }
+}
+
+function shuffle(a){
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    const t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+$("startBtn").addEventListener("click", () => {
+  if (!S.who || !S.list.length) return;
+  const pool = shuffle(S.list.slice()).map(r => ({en:r[0], ru:r[1], uz:r[2]}));
+  const r1 = pool.map(w => ({w, dir:1}));
+  const r2 = shuffle(pool.slice()).map(w => ({w, dir:2, show: Math.random() < 0.5 ? "ru" : "uz"}));
+  S.queue = r1.concat(r2);
+  S.i = 0; S.ok = 0; S.wrong = []; S.unsure = []; S.marks = [];
+  $("whoLabel").innerHTML = 'Answering: <b>' + esc(S.who) + '</b>';
+  $("quitBtn").hidden = false; $("track").hidden = false;
+  view("vAsk"); drawQ();
+});
+
+function drawTrack(){
+  const t = $("track"); t.innerHTML = "";
+  S.queue.forEach((_, n) => {
+    const d = document.createElement("span");
+    const m = S.marks[n];
+    d.className = "seg" + (n < S.i ? (m === true ? " done" : m === "hold" ? " hold" : " miss")
+                                   : n === S.i ? " now" : "");
+    t.appendChild(d);
+  });
+}
+function drawQ(){
+  const it = S.queue[S.i];
+  S.locked = false; S.busy = false;
+  $("pos").textContent = "Round " + it.dir + " · " + (S.i + 1) + "/" + S.queue.length;
+  drawTrack();
+  $("slot").innerHTML = "";
+  const a = $("answer"); a.value = ""; a.disabled = false;
+  $("go").textContent = "Check";
+  if (it.dir === 1){
+    $("asked").textContent = "English → русский / o‘zbekcha";
+    $("word").textContent = it.w.en;
+    a.placeholder = "ответ / javob";
+  }else{
+    $("asked").textContent = (it.show === "ru" ? "Русский" : "O‘zbekcha") + " → English";
+    $("word").textContent = it.show === "ru" ? it.w.ru : it.w.uz;
+    a.placeholder = "answer in English";
+  }
+  a.focus();
+}
+
+function showVerdict(kind, it, byClaude, note){
+  const box = document.createElement("div");
+  box.className = "verdict " + kind;
+  const head = document.createElement("div");
+  head.className = "vhead";
+  head.textContent = kind === "ok" ? "✓ To‘g‘ri · Верно"
+    : kind === "hold" ? "⚑ Otlozheno · Отложено"
+    : "✕ Noto‘g‘ri · Неверно";
+  if (byClaude){
+    const t = document.createElement("span");
+    t.className = "tagwho"; t.textContent = "Claude";
+    head.appendChild(t);
+  }
+  box.appendChild(head);
+  const right = document.createElement("p");
+  right.className = "right";
+  right.innerHTML = it.dir === 1
+    ? '<span class="lang">RU</span><b>' + esc(it.w.ru) + '</b><br><span class="lang">UZ</span><b>' + esc(it.w.uz) + '</b>'
+    : '<span class="lang">EN</span><b>' + esc(it.w.en) + '</b>';
+  box.appendChild(right);
+  if (note){
+    const n = document.createElement("p"); n.className = "note"; n.textContent = note;
+    box.appendChild(n);
+  }
+  $("slot").innerHTML = ""; $("slot").appendChild(box);
+}
+
+async function check(){
+  if (S.busy) return;
+  if (S.locked){ advance(); return; }
+  const it = S.queue[S.i];
+  const given = $("answer").value.trim();
+  if (!given){ toast("Type your answer, or press “I don’t know”"); return; }
+
+  const lang = it.dir === 1 ? "other" : "en";
+  const expected = it.dir === 1 ? [it.w.ru, it.w.uz] : [it.w.en];
+  if (localHit(given, expected, lang)){ settle("ok", it, false, "", given); return; }
+
+  S.busy = true;
+  $("answer").disabled = true;
+  $("slot").innerHTML = '<div class="verdict think"><div class="vhead">Checking' +
+    '<span class="dots"><i></i><i></i><i></i></span></div></div>';
+  let d = null;
+  try{
+    const r = await fetch("/api/judge", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({item: {en: it.w.en, ru: it.w.ru, uz: it.w.uz,
+                                   dir: it.dir, show: it.show}, given: given}),
+    });
+    d = await r.json();
+  }catch(e){}
+  S.busy = false;
+  if (d && d.verdict === "ok")  return settle("ok",  it, true, d.note || "", given);
+  if (d && d.verdict === "no")  return settle("bad", it, true, d.note || "", given);
+  // No verdict to be had — do not call a possibly-right answer wrong.
+  settle("hold", it, false,
+    "Отложено — проверит Akbar", given);
+}
+
+function settle(kind, it, byClaude, note, given){
+  S.locked = true;
+  S.marks[S.i] = kind === "ok" ? true : kind === "hold" ? "hold" : false;
+  $("answer").disabled = true;
+  if (kind === "ok") S.ok++;
+  else if (kind === "hold") S.unsure.push({en: it.w.en, given: given});
+  else S.wrong.push(it);
+  showVerdict(kind, it, byClaude, note);
+  drawTrack();
+  $("go").textContent = (S.i + 1 >= S.queue.length) ? "See the result" : "Next";
+  $("go").focus();
+}
+function advance(){
+  S.i++;
+  if (S.i >= S.queue.length) return finish();
+  drawQ();
+}
+
+async function finish(){
+  const total = S.queue.length;
+  const pct = total ? Math.round(S.ok / total * 100) : 0;
+  $("quitBtn").hidden = true; $("track").hidden = true; $("pos").textContent = "";
+  $("doneWho").textContent = S.who + " · " + new Date().toLocaleDateString();
+  $("score").textContent = S.ok + " / " + total + "  (" + pct + "%)";
+  $("doneLine").textContent =
+    (S.unsure.length ? S.unsure.length + " answer(s) put aside for Akbar. " : "") +
+    (S.wrong.length ? "Worth another look:" : S.unsure.length ? "" : "Every answer correct.");
+
+  const host = $("missed"); host.innerHTML = "";
+  const seen = new Set();
+  S.wrong.forEach(it => {
+    if (seen.has(it.w.en)) return;
+    seen.add(it.w.en);
+    const row = document.createElement("div");
+    row.className = "m";
+    row.innerHTML = "<b>" + esc(it.w.en) + "</b><span>" + esc(it.w.ru) + " · " + esc(it.w.uz) + "</span>";
+    host.appendChild(row);
+  });
+  view("vDone");
+
+  try{
+    await fetch("/api/result", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({who: S.who, total: total, ok: S.ok,
+                            missed: [...seen], unsure: S.unsure}),
+    });
+  }catch(e){ toast("Result not saved — the computer did not answer"); }
+}
+
+/* ---- voice ---- */
+let rec = null, hearing = false;
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (SR) $("mic").hidden = false;
+function micOff(){ hearing = false; $("mic").setAttribute("aria-pressed", "false"); }
+$("mic").addEventListener("click", () => {
+  if (hearing){ try{ rec && rec.stop(); }catch(e){} micOff(); return; }
+  const it = S.queue[S.i];
+  try{
+    rec = new SR();
+    rec.lang = it && it.dir === 2 ? "en-US" : "ru-RU";
+    rec.interimResults = false; rec.maxAlternatives = 1;
+    rec.onresult = e => { micOff(); $("answer").value = e.results[0][0].transcript; check(); };
+    rec.onerror = () => { micOff(); $("mic").hidden = true; toast("Voice does not work here — type the answer"); };
+    rec.onend = micOff;
+    rec.start(); hearing = true; $("mic").setAttribute("aria-pressed", "true");
+  }catch(err){ micOff(); $("mic").hidden = true; toast("Voice does not work here — type the answer"); }
+});
+
+/* ---- wiring ---- */
+$("go").addEventListener("click", check);
+$("dunno").addEventListener("click", () => {
+  if (S.locked || S.busy) return;
+  settle("bad", S.queue[S.i], false, "", "");
+});
+$("answer").addEventListener("keydown", e => {
+  if (e.key === "Enter"){ e.preventDefault(); check(); }
+});
+$("quitBtn").addEventListener("click", () => {
+  if (!window.confirm("Stop the test? Your answers so far are not kept.")) return;
+  $("quitBtn").hidden = true; $("track").hidden = true; $("pos").textContent = "";
+  $("whoLabel").innerHTML = "Red Tide &nbsp;&middot;&nbsp; test";
+  view("vSetup");
+});
+$("againBtn").addEventListener("click", () => {
+  $("whoLabel").innerHTML = "Red Tide &nbsp;&middot;&nbsp; test";
+  view("vSetup");
+  if (S.who) choose(S.who);
+});
+</script>
+</body>
+</html>

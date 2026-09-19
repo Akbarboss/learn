@@ -10,3 +10,8 @@ android/.idea/
 Thumbs.db
 .DS_Store
 .claude/
+
+# local test server: the key and the brothers' results stay off GitHub
+local/api-key.txt
+local/results/
+local/__pycache__/
