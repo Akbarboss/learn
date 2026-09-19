@@ -466,6 +466,7 @@ footer p{margin:0 0 6px;max-width:62ch}
     <span class="who-label">Kim o&rsquo;qiyapti</span>
     <div class="profiles" id="profiles" role="group" aria-label="Choose who is studying"></div>
     <button class="btn" id="reportBtn">Copy report</button>
+    <button class="btn" id="codeBtn">Copy test code</button>
     <span class="sync-status" id="syncStatus" aria-live="polite">Local</span>
   </div>
 </div>
@@ -1153,6 +1154,45 @@ document.getElementById('reportBtn').addEventListener('click',async()=>{
     say('Hisobot nusxalandi — Telegramga yuboring');
   }catch(e2){
     window.prompt('Copy this and send it:',text);
+  }
+  ta.remove();
+});
+
+/* ---------- test code ------------------------------------------------
+   The test lives on a separate page that cannot read these ticks, so
+   hand them over as a short code: one bit per word, in the order the
+   words appear below, base64url. 247 words fit in 42 characters. */
+const FLAT=[];
+DATA.forEach(([t,r,u,id,items])=>items.forEach(([en])=>FLAT.push(slug(en))));
+
+function buildTestCode(){
+  const n=FLAT.length;
+  const bytes=new Uint8Array(Math.ceil(n/8));
+  FLAT.forEach((k,i)=>{if(learned.has(k))bytes[i>>3]|=(1<<(i&7));});
+  let s='';
+  for(let i=0;i<bytes.length;i++)s+=String.fromCharCode(bytes[i]);
+  return 'RT1.'+n+'.'+btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+
+document.getElementById('codeBtn').addEventListener('click',async()=>{
+  if(!store.active){openGate();say('Avval ismni tanlang · Сначала выберите имя');return;}
+  if(!learned.size){say('Avval so‘zlarni belgilang · Сначала отметьте выученные слова');return;}
+  const code=buildTestCode();
+  try{
+    await navigator.clipboard.writeText(code);
+    say(learned.size+' ta so‘z — kod nusxalandi · код скопирован');
+    return;
+  }catch(e){}
+  const ta=document.createElement('textarea');
+  ta.value=code;
+  ta.style.cssText='position:fixed;top:0;left:0;opacity:0';
+  document.body.appendChild(ta);
+  ta.focus();ta.select();
+  try{
+    document.execCommand('copy');
+    say(learned.size+' ta so‘z — kod nusxalandi · код скопирован');
+  }catch(e2){
+    window.prompt('Copy this code into the test:',code);
   }
   ta.remove();
 });
