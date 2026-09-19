@@ -188,7 +188,7 @@ h1{font-family:Literata,Georgia,serif;font-weight:600;
 const $ = id => document.getElementById(id);
 let WORDS = [], PEOPLE = [], HAS_CLAUDE = false;
 const S = {who:null, list:[], queue:[], i:0, ok:0, wrong:[], unsure:[], marks:[],
-           locked:false, busy:false};
+           pending:[], locked:false, busy:false};
 
 /* ---- answer matching: the same forgiving local check, then the server ---- */
 function norm(t, lang){
@@ -312,7 +312,7 @@ $("startBtn").addEventListener("click", () => {
   const r1 = pool.map(w => ({w, dir:1}));
   const r2 = shuffle(pool.slice()).map(w => ({w, dir:2, show: Math.random() < 0.5 ? "ru" : "uz"}));
   S.queue = r1.concat(r2);
-  S.i = 0; S.ok = 0; S.wrong = []; S.unsure = []; S.marks = [];
+  S.i = 0; S.ok = 0; S.wrong = []; S.unsure = []; S.marks = []; S.pending = [];
   $("whoLabel").innerHTML = 'Answering: <b>' + esc(S.who) + '</b>';
   $("quitBtn").hidden = false; $("track").hidden = false;
   view("vAsk"); drawQ();
@@ -386,26 +386,12 @@ async function check(){
   const expected = it.dir === 1 ? [it.w.ru, it.w.uz] : [it.w.en];
   if (localHit(given, expected, lang)){ settle("ok", it, false, "", given); return; }
 
-  S.busy = true;
-  $("answer").disabled = true;
-  $("slot").innerHTML = '<div class="verdict think"><div class="vhead">Checking' +
-    '<span class="dots"><i></i><i></i><i></i></span></div></div>';
-  let d = null;
-  try{
-    const r = await fetch("/api/judge", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({item: {en: it.w.en, ru: it.w.ru, uz: it.w.uz,
-                                   dir: it.dir, show: it.show}, given: given}),
-    });
-    d = await r.json();
-  }catch(e){}
-  S.busy = false;
-  if (d && d.verdict === "ok")  return settle("ok",  it, true, d.note || "", given);
-  if (d && d.verdict === "no")  return settle("bad", it, true, d.note || "", given);
-  // No verdict to be had — do not call a possibly-right answer wrong.
+  // Not in our dictionary — which is a question, not a verdict. Asking now
+  // would stall him for several seconds on every such word, so the answer
+  // goes on a list and the whole list is judged in one call at the end.
+  S.pending.push({i: S.i, it: it, given: given});
   settle("hold", it, false,
-    "Отложено — проверит Akbar", given);
+    "Проверим в конце — не считается ошибкой", given);
 }
 
 function settle(kind, it, byClaude, note, given){
@@ -413,8 +399,8 @@ function settle(kind, it, byClaude, note, given){
   S.marks[S.i] = kind === "ok" ? true : kind === "hold" ? "hold" : false;
   $("answer").disabled = true;
   if (kind === "ok") S.ok++;
-  else if (kind === "hold") S.unsure.push({en: it.w.en, given: given});
-  else S.wrong.push(it);
+  else if (kind === "bad") S.wrong.push(it);
+  // a "hold" is decided after the last question, all of them together
   showVerdict(kind, it, byClaude, note);
   drawTrack();
   $("go").textContent = (S.i + 1 >= S.queue.length) ? "See the result" : "Next";
@@ -428,9 +414,37 @@ function advance(){
 
 async function finish(){
   const total = S.queue.length;
-  const pct = total ? Math.round(S.ok / total * 100) : 0;
   $("quitBtn").hidden = true; $("track").hidden = true; $("pos").textContent = "";
   $("doneWho").textContent = S.who + " · " + new Date().toLocaleDateString();
+
+  // Everything the dictionary could not place is decided here, in one call,
+  // so nobody waited for it during the test.
+  if (S.pending.length){
+    view("vDone");
+    $("score").textContent = "…";
+    $("doneLine").textContent = S.pending.length +
+      " ответ(ов) проверяет Claude…";
+    $("missed").innerHTML = "";
+    let verdicts = [];
+    try{
+      const r = await fetch("/api/judge-batch", {
+        method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({items: S.pending.map(p => ({
+          en: p.it.w.en, ru: p.it.w.ru, uz: p.it.w.uz,
+          dir: p.it.dir, show: p.it.show, given: p.given,
+        }))}),
+      });
+      verdicts = (await r.json()).verdicts || [];
+    }catch(e){}
+    S.pending.forEach((p, k) => {
+      const v = verdicts[k];
+      if (v && v.verdict === "ok"){ S.ok++; S.marks[p.i] = true; }
+      else if (v && v.verdict === "no"){ S.wrong.push(p.it); S.marks[p.i] = false; }
+      else { S.unsure.push({en: p.it.w.en, given: p.given}); S.marks[p.i] = "hold"; }
+    });
+  }
+
+  const pct = total ? Math.round(S.ok / total * 100) : 0;
   $("score").textContent = S.ok + " / " + total + "  (" + pct + "%)";
   $("doneLine").textContent =
     (S.unsure.length ? S.unsure.length + " answer(s) put aside for Akbar. " : "") +

@@ -35,6 +35,8 @@ import socketserver
 import ssl
 import subprocess
 import sys
+import tempfile
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -86,6 +88,7 @@ def find_cli():
 
 
 CLAUDE_CLI = find_cli()
+NEUTRAL_DIR = tempfile.mkdtemp(prefix='wordbook-judge-')
 CLI_NOT_LOGGED_IN = False     # set once, so the console is not spammed
 
 
@@ -184,6 +187,82 @@ def judge_prompt(item, given):
                                uz=item['uz'], given=given)
 
 
+BATCH_PROMPT = (
+    "You are marking answers in a vocabulary test. The learner is a teenager "
+    "learning English; their first languages are Uzbek and Russian.\n\n"
+    "Accept an answer when it means the same thing: a synonym not in our "
+    "dictionary, another grammatical form, a different but fair wording, a "
+    "spelling slip, or Uzbek written in Latin letters. Reject it when it means "
+    "something else, when it is only loosely associated, or when it is empty "
+    "or nonsense.\n\n"
+    "Here are {n} answers to mark:\n\n{rows}\n\n"
+    "Reply with only a JSON array of {n} objects, one per number, in order:\n"
+    '[{{"n": 1, "ok": true, "note": "..."}}, ...]\n'
+    "note is at most eight words in Russian saying why."
+)
+
+
+def batch_rows(items):
+    out = []
+    for i, it in enumerate(items, 1):
+        if it.get('dir') == 1:
+            asked = 'shown the English word, had to answer in Russian or Uzbek'
+        else:
+            asked = ('shown the %s translation, had to answer in English'
+                     % ('Russian' if it.get('show') == 'ru' else 'Uzbek'))
+        out.append(
+            '%d. English: %s | Russian: %s | Uzbek: %s\n'
+            '   asked: %s\n'
+            '   learner answered: %s'
+            % (i, it.get('en', ''), it.get('ru', ''), it.get('uz', ''),
+               asked, it.get('given', '')))
+    return '\n\n'.join(out)
+
+
+def read_verdict_list(text, n):
+    """Pull the JSON array back out, and keep only well-formed entries."""
+    m = re.search(r'\[.*\]', text or '', re.S)
+    if not m:
+        return None
+    try:
+        got = json.loads(m.group(0))
+    except Exception:
+        return None
+    if not isinstance(got, list):
+        return None
+    out = [None] * n
+    for row in got:
+        if not isinstance(row, dict):
+            continue
+        try:
+            idx = int(row.get('n', 0)) - 1
+        except Exception:
+            continue
+        if 0 <= idx < n and isinstance(row.get('ok'), bool):
+            out[idx] = (row['ok'], str(row.get('note') or ''))
+    return out
+
+
+def judge_many(items):
+    """One call for every answer the dictionary could not place.
+
+    N separate calls would each pay the command line's ~7 second startup;
+    together they are one wait the learner never sees, because this runs
+    after the last question.
+    """
+    if not items:
+        return []
+    prompt = BATCH_PROMPT.format(n=len(items), rows=batch_rows(items))
+    text = ''
+    if CLAUDE_CLI and not CLI_NOT_LOGGED_IN:
+        text, _ = cli_raw(prompt)
+    if not text and API_KEY:
+        text, _ = api_raw(prompt)
+    if not text:
+        return [None] * len(items)
+    return read_verdict_list(text, len(items)) or [None] * len(items)
+
+
 def read_verdict(text):
     """Pull {"ok": ..., "note": ...} out of whatever came back."""
     m = re.search(r'\{.*\}', text or '', re.S)
@@ -198,21 +277,25 @@ def read_verdict(text):
     return got['ok'], str(got.get('note') or '')
 
 
-def ask_via_cli(prompt):
-    """Ask through the Claude Code command line — uses the subscription, no key.
-    The prompt goes in on stdin so nothing has to survive shell quoting."""
+def cli_raw(prompt):
+    """Whatever the Claude Code command line wrote, or ('', reason).
+
+    Uses the subscription, no API key. The prompt goes in on stdin so a long
+    multilingual prompt never has to survive Windows shell quoting.
+    """
     global CLI_NOT_LOGGED_IN
     if CLI_NOT_LOGGED_IN:
-        return None, 'cli_logged_out'
+        return '', 'cli_logged_out'
     try:
-        p = subprocess.run(cli_argv() + ['-p'], input=prompt,
+        p = subprocess.run(cli_argv() + ['--strict-mcp-config', '-p'],
+                           input=prompt, cwd=NEUTRAL_DIR,
                            capture_output=True, text=True, encoding='utf-8',
-                           errors='replace', timeout=120)
+                           errors='replace', timeout=240)
     except subprocess.TimeoutExpired:
-        return None, 'cli_timeout'
+        return '', 'cli_timeout'
     except Exception as e:
         print('  [judge] cli: %s' % e)
-        return None, 'cli_failed'
+        return '', 'cli_failed'
 
     out = (p.stdout or '') + (p.stderr or '')
     if 'Not logged in' in out or '/login' in out:
@@ -223,16 +306,23 @@ def ask_via_cli(prompt):
         print('     then type:  /login   — once, then restart this server.')
         print('     Until then answers the dictionary cannot place are put aside.')
         print('')
-        return None, 'cli_logged_out'
+        return '', 'cli_logged_out'
     if p.returncode != 0 and not p.stdout:
-        return None, 'cli_failed'
-    return read_verdict(p.stdout)
+        return '', 'cli_failed'
+    return (p.stdout or ''), ''
 
 
-def ask_via_api(prompt):
+def ask_via_cli(prompt):
+    text, err = cli_raw(prompt)
+    if not text:
+        return None, err or 'cli_failed'
+    return read_verdict(text)
+
+
+def api_raw(prompt):
     body = json.dumps({
         'model': MODEL,
-        'max_tokens': 200,
+        'max_tokens': 4000,
         'messages': [{
             'role': 'user',
             'content': prompt,
@@ -250,15 +340,22 @@ def ask_via_api(prompt):
     except urllib.error.HTTPError as e:
         detail = e.read().decode('utf-8', 'replace')[:200]
         print('  [judge] HTTP %s %s' % (e.code, detail))
-        return None, 'http_%s' % e.code
+        return '', 'http_%s' % e.code
     except Exception as e:
         print('  [judge] %s' % e)
-        return None, 'unreachable'
+        return '', 'unreachable'
 
     text = ''
     for block in payload.get('content', []):
         if block.get('type') == 'text':
             text += block.get('text', '')
+    return text, ''
+
+
+def ask_via_api(prompt):
+    text, err = api_raw(prompt)
+    if not text:
+        return None, err or 'unreachable'
     return read_verdict(text)
 
 
@@ -388,6 +485,24 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             print('  [judge] %-22s <- %-22s %s' % (
                 item.get('en', '')[:22], given[:22], 'OK' if ok else 'no'))
             return self._send(200, {'verdict': 'ok' if ok else 'no', 'note': note})
+
+        if self.path == '/api/judge-batch':
+            items = data.get('items') or []
+            if not isinstance(items, list) or not items:
+                return self._send(200, {'verdicts': []})
+            items = items[:80]
+            t0 = time.time()
+            got = judge_many(items)
+            out = []
+            for i, v in enumerate(got):
+                if v is None:
+                    out.append({'verdict': 'unknown'})
+                else:
+                    out.append({'verdict': 'ok' if v[0] else 'no', 'note': v[1]})
+            done = sum(1 for v in out if v['verdict'] != 'unknown')
+            print('  [judge] %d answers in one call, %d decided, %.1fs'
+                  % (len(items), done, time.time() - t0))
+            return self._send(200, {'verdicts': out})
 
         if self.path == '/api/result':
             data['at'] = datetime.now().isoformat(timespec='seconds')
