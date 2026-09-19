@@ -296,9 +296,17 @@ def cli_raw(prompt):
     global CLI_NOT_LOGGED_IN
     if not cli_usable():
         return '', 'cli_logged_out'
+    # A machine pointed at a local model (ANTHROPIC_BASE_URL=localhost:11434 and
+    # a dummy token is a common leftover) would send this to an address that is
+    # not listening — "connection refused", and nothing gets marked. The command
+    # line should use the account it is logged in with, so those are dropped.
+    env = dict(os.environ)
+    for name in ('ANTHROPIC_BASE_URL', 'ANTHROPIC_AUTH_TOKEN', 'ANTHROPIC_API_KEY'):
+        env.pop(name, None)
+
     try:
         p = subprocess.run(cli_argv() + ['--strict-mcp-config', '-p'],
-                           input=prompt, cwd=NEUTRAL_DIR,
+                           input=prompt, cwd=NEUTRAL_DIR, env=env,
                            capture_output=True, text=True, encoding='utf-8',
                            errors='replace', timeout=240)
     except subprocess.TimeoutExpired:
