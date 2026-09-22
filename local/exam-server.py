@@ -155,12 +155,13 @@ KEYS = [slug(w[0]) for w in WORDS]
 
 
 def firebase_learned(name):
-    """That learner's ticked words, as indices into WORDS, newest tick first.
+    """That learner's ticked words, as indices into WORDS, in wordbook order.
 
-    The wordbook's log holds one row per action — [word, 1 or 0, time] — so the
-    moment each word was ticked is recoverable. Ordering by it is what lets the
-    test ask "the last 15 words I learned". Anything ticked before the log
-    existed has no time and sorts to the end.
+    Order matters: the test's "last N" takes the tail of this list, so with 100
+    ticked and N=30 it asks the 71st to the 100th ticked word as they stand in
+    the book — the part furthest down it. Ordering by when each word was ticked
+    was tried first and read as wrong, because a word near the front of the book
+    can be ticked late.
     """
     url = '%s/%s.json' % (FIREBASE, name)
     try:
@@ -173,17 +174,7 @@ def firebase_learned(name):
         return [], None
 
     have = set(data.get('learned') or [])
-    when = {}
-    for row in (data.get('log') or []):
-        if not isinstance(row, list) or len(row) < 3 or not row[1]:
-            continue
-        key, stamp = row[0], row[2]
-        if isinstance(stamp, (int, float)):
-            when[key] = max(when.get(key, 0), stamp)
-
-    idx = [i for i, k in enumerate(KEYS) if k in have]
-    idx.sort(key=lambda i: when.get(KEYS[i], 0), reverse=True)
-    return idx, None
+    return [i for i, k in enumerate(KEYS) if k in have], None
 
 
 JUDGE_PROMPT = (

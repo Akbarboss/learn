@@ -170,10 +170,10 @@ h1{font-family:Literata,Georgia,serif;font-weight:600;
     <p class="fieldlabel">Start from</p>
     <div class="row" id="pickFirst" style="margin-bottom:22px"></div>
 
-    <p class="fieldlabel">How many of the newest words</p>
+    <p class="fieldlabel">How many from the end of the list</p>
     <div class="countrow">
       <input id="howMany" type="number" min="1" step="1" inputmode="numeric"
-             placeholder="all" aria-label="How many of the most recently ticked words">
+             placeholder="all" aria-label="How many words from the end of the ticked list">
       <span id="countNote"></span>
     </div>
 
@@ -340,7 +340,8 @@ function updateStart(){
   if (!have) note.textContent = "";
   else if (!want) note.textContent = "all " + have + " ticked words";
   else if (want >= have) note.textContent = "only " + have + " ticked so far — all of them";
-  else note.textContent = "the " + use + " most recently ticked";
+  // name the actual range, because "last 30" is easiest to check that way
+  else note.textContent = "words " + (have - use + 1) + "–" + have + " of " + have + " ticked";
 }
 
 async function choose(name){
@@ -381,8 +382,8 @@ $("howMany").addEventListener("input", updateStart);
 $("startBtn").addEventListener("click", () => {
   if (!S.who || !S.list.length) return;
   const want = wantedCount();
-  // S.list is newest-ticked first, so slicing the front takes the newest
-  const chosen = want ? S.list.slice(0, want) : S.list;
+  // S.list is in wordbook order, so the tail is the part furthest down the book
+  const chosen = want ? S.list.slice(-want) : S.list;
   const pool = shuffle(chosen.slice()).map(r => ({en:r[0], ru:r[1], uz:r[2]}));
   const toTr = pool.map(w => ({w, dir:1}));                  // English → ru / uz
   const toEn = shuffle(pool.slice()).map(w => ({w, dir:2}));  // ru + uz → English
