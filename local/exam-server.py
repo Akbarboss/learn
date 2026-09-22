@@ -47,7 +47,7 @@ RESULTS = os.path.join(HERE, 'results')
 PORT = int(os.environ.get('EXAM_PORT', '8765'))
 
 FIREBASE = 'https://learn-english-wordbook-default-rtdb.firebaseio.com'
-PEOPLE = ['Akbar', 'Abror', 'Muhammadali']
+PEOPLE = ['Akbar', 'Abror', 'Muhammadali', 'Zilola']
 
 MODEL = os.environ.get('EXAM_MODEL', 'claude-haiku-4-5-20251001')
 API_URL = 'https://api.anthropic.com/v1/messages'

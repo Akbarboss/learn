@@ -1,8 +1,8 @@
 {
   "rules": {
     "$learner": {
-      ".read": "$learner === 'Akbar' || $learner === 'Abror' || $learner === 'Muhammadali'",
-      ".write": "$learner === 'Akbar' || $learner === 'Abror' || $learner === 'Muhammadali'"
+      ".read": "$learner === 'Akbar' || $learner === 'Abror' || $learner === 'Muhammadali' || $learner === 'Zilola'",
+      ".write": "$learner === 'Akbar' || $learner === 'Abror' || $learner === 'Muhammadali' || $learner === 'Zilola'"
     }
   }
 }
