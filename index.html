@@ -218,6 +218,17 @@ section.chapter{margin-top:52px;scroll-margin-top:150px}
   font-size:.72rem;color:var(--ink-3);font-variant-numeric:tabular-nums;
 }
 
+/* ---------- words that failed the test ---------- */
+.chapter.review .chapter-head{border-bottom-color:var(--uz)}
+.chapter.review .chapter-head h2{color:var(--uz)}
+.chapter.review .count{color:var(--uz)}
+.review-note{
+  margin:12px 0 2px;padding:11px 14px;
+  background:var(--surface);border:1px solid var(--line);
+  border-left:3px solid var(--uz);border-radius:5px;
+  font-size:.88rem;color:var(--ink-2);max-width:62ch;
+}
+
 /* ---------- entries ---------- */
 .entries{border-bottom:1px solid var(--line)}
 .entry{
@@ -483,7 +494,17 @@ footer p{margin:0 0 6px;max-width:62ch}
 
 <nav class="jump" id="jump" aria-label="Jump to chapter"></nav>
 
-<main id="out"></main>
+<main id="out">
+  <section class="chapter review" id="review" hidden>
+    <div class="chapter-head">
+      <h2>To relearn<span class="native">Takrorlash kerak &nbsp;·&nbsp; Повторить</span></h2>
+      <span class="count">0</span>
+    </div>
+    <p class="review-note">Эти слова не вспомнились на проверке, и галочка с них снята.
+      Отметьте снова, когда выучите &mdash; тогда они уйдут отсюда.</p>
+    <div class="entries" id="reviewEntries"></div>
+  </section>
+</main>
 
 <footer>
   <p>Built from the double-subtitle file for <i>The Mentalist</i> S1&nbsp;E3 &ldquo;Red Tide&rdquo;. Timestamps point at the minute the line is spoken, so you can scrub straight to it.</p>
@@ -838,6 +859,13 @@ DATA.forEach(([title,ru,uz,id,items])=>{
   jump.appendChild(a);
 });
 out.appendChild(frag);
+
+const reviewChip=document.createElement('a');
+reviewChip.href='#review';
+reviewChip.dataset.jump='review';
+reviewChip.innerHTML='To relearn <b>0</b>';
+reviewChip.hidden=true;
+jump.insertBefore(reviewChip,jump.firstChild);
 document.getElementById('totalCount').textContent=total;
 
 const empty=document.createElement('p');
@@ -867,7 +895,7 @@ const VALID=new Set([...document.querySelectorAll('.entry')].map(e=>e.dataset.ke
 const SYNC=window.WORDBOOK_SYNC||{};
 const cloudReady=Boolean(SYNC.databaseUrl&& !String(SYNC.databaseUrl).includes('YOUR_'));
 
-const blank=()=>({learned:[],log:[],days:{}});
+const blank=()=>({learned:[],log:[],days:{},review:[]});
 let store={active:null,data:{}};
 let learned=new Set();
 
@@ -883,6 +911,7 @@ let learned=new Set();
     if(!Array.isArray(p.learned))p.learned=[];
     if(!Array.isArray(p.log))p.log=[];
     if(!p.days||typeof p.days!=='object')p.days={};
+    if(!Array.isArray(p.review))p.review=[];
   });
   if(PEOPLE.indexOf(store.active)<0)store.active=null;
   // one-time move from the older single-learner version
@@ -927,7 +956,9 @@ function mergeProfile(a,b){
   });
   const days={...(a.days||{})};
   Object.entries(b.days||{}).forEach(([d,n])=>{days[d]=Math.max(Number(days[d]||0),Number(n||0));});
-  return {learned:[...learnedSet],log,days};
+  const review=[...new Set([...(a.review||[]),...(b.review||[])])]
+    .filter(k=>VALID.has(k)&&!learnedSet.has(k));
+  return {learned:[...learnedSet],log,days,review};
 }
 async function cloudGet(name){
   const res=await cloudFetch('/'+encodeURIComponent(name));
@@ -942,7 +973,7 @@ async function cloudGetAll(){
   }))).filter(Boolean);
 }
 async function cloudPut(name,profile){
-  const res=await cloudFetch('/'+encodeURIComponent(name),{method:'PUT',body:JSON.stringify({learned:profile.learned,log:profile.log,days:profile.days,updated_at:new Date().toISOString()})});
+  const res=await cloudFetch('/'+encodeURIComponent(name),{method:'PUT',body:JSON.stringify({learned:profile.learned,log:profile.log,days:profile.days,review:profile.review||[],updated_at:new Date().toISOString()})});
   if(!res.ok)throw new Error('PUT '+res.status);
 }
 async function syncAllSummaries(){
@@ -1001,6 +1032,25 @@ function paint(){
   document.getElementById('progLabel').textContent=
     (store.active?store.active+':  ':'')+n+' / '+total+' learned';
   document.getElementById('barFill').style.width=(total?(n/total*100):0)+'%';
+  renderReview();
+}
+
+function renderReview(){
+  const box=document.getElementById('review');
+  const host=document.getElementById('reviewEntries');
+  const chip=jump.querySelector('[data-jump="review"]');
+  const p=store.active?store.data[store.active]:null;
+  const keys=(p&&Array.isArray(p.review)?p.review:[])
+    .filter(k=>VALID.has(k)&&!learned.has(k));
+
+  host.innerHTML='';
+  keys.forEach(k=>{
+    const src=out.querySelector('section.chapter:not(#review) .entry[data-key="'+k+'"]');
+    if(src)host.appendChild(src.cloneNode(true));
+  });
+  box.hidden=keys.length===0;
+  box.querySelector('.count').textContent=keys.length;
+  if(chip){chip.hidden=keys.length===0;chip.querySelector('b').textContent=keys.length;}
 }
 
 function renderProfiles(){
@@ -1065,6 +1115,10 @@ out.addEventListener('click',ev=>{
 
     const p=store.data[store.active];
     p.learned=[...learned];
+    if(on&&Array.isArray(p.review)){              // learned again: off the list
+      const at=p.review.indexOf(key);
+      if(at>=0)p.review.splice(at,1);
+    }
     p.log.push([key,on?1:0,Date.now()]);          // every action, with its time
     if(p.log.length>6000)p.log.splice(0,p.log.length-6000);
     if(on){const d=today();p.days[d]=(p.days[d]||0)+1;}

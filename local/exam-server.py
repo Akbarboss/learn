@@ -177,6 +177,60 @@ def firebase_learned(name):
     return [i for i, k in enumerate(KEYS) if k in have], None
 
 
+def firebase_mark_wrong(name, en_words):
+    """Untick what was missed and queue it for relearning.
+
+    The untick is also written to the log as [word, 0, time]. The wordbook
+    rebuilds its learned set from that log when two devices merge, so without
+    the log row a phone holding an older copy would simply tick the word back.
+    """
+    valid = set(KEYS)
+    order = {k: i for i, k in enumerate(KEYS)}
+    keys = []
+    for w in en_words:
+        k = slug(str(w or ''))
+        if k in valid and k not in keys:
+            keys.append(k)
+    if not keys:
+        return 0, None
+
+    url = '%s/%s.json' % (FIREBASE, name)
+    ctx = ssl.create_default_context()
+    try:
+        with urllib.request.urlopen(url, timeout=12, context=ctx) as r:
+            data = json.loads(r.read().decode('utf-8') or 'null')
+    except Exception as e:
+        return 0, str(e)
+    if not isinstance(data, dict):
+        data = {}
+
+    drop = set(keys)
+    learned = [k for k in (data.get('learned') or []) if k not in drop]
+    log = list(data.get('log') or [])
+    now = int(time.time() * 1000)
+    log.extend([[k, 0, now] for k in keys])
+    if len(log) > 6000:
+        log = log[-6000:]
+    review = sorted(set(data.get('review') or []) | drop,
+                    key=lambda k: order.get(k, 1 << 30))
+
+    body = json.dumps({
+        'learned': learned,
+        'log': log,
+        'days': data.get('days') or {},
+        'review': review,
+        'updated_at': datetime.now().isoformat(timespec='seconds'),
+    }).encode('utf-8')
+    req = urllib.request.Request(url, data=body, method='PUT')
+    req.add_header('content-type', 'application/json')
+    try:
+        with urllib.request.urlopen(req, timeout=15, context=ctx) as r:
+            r.read()
+    except Exception as e:
+        return 0, str(e)
+    return len(keys), None
+
+
 JUDGE_PROMPT = (
     "You are marking one answer in a vocabulary test. The learner is a teenager "
     "learning English; their first languages are Uzbek and Russian.\n\n"
@@ -546,7 +600,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             name = save_result(data)
             print('  [result] %s  %s/%s  -> %s' % (
                 data.get('who'), data.get('ok'), data.get('total'), name))
-            return self._send(200, {'saved': name})
+
+            # Only the ones actually judged wrong. An answer put aside because
+            # nothing could judge it is not a mistake and keeps its tick.
+            missed = data.get('missed') or []
+            words = [m.get('en') if isinstance(m, dict) else m for m in missed]
+            moved, err = firebase_mark_wrong(data.get('who'), words)
+            if err:
+                print('  [review] could not update the wordbook: %s' % err)
+            elif moved:
+                print('  [review] %d word(s) unticked and queued to relearn' % moved)
+            return self._send(200, {'saved': name, 'review': moved})
 
         return self._send(404, {'error': 'no such endpoint'})
 
